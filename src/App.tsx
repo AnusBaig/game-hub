@@ -3,6 +3,7 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import { Grid, GridItem, Hide, Show } from "@chakra-ui/react";
+import Navbar from "./components/navbar/Navbar";
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
       }}
     >
       <GridItem area='nav' bg='teal'>
-        Nav
+        <Navbar />
       </GridItem>
       <Show breakpoint='(min-width: 768px) and (max-width: 992px)'>
         <GridItem area='slider' bg='pink'>
