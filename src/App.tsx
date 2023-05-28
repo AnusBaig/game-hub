@@ -1,8 +1,7 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import { Grid, GridItem, Hide, Show } from "@chakra-ui/react";
+import Navbar from "./components/navbar/Navbar";
+import GameGrid from "./components/game/GameGrid";
 
 function App() {
   return (
@@ -14,8 +13,8 @@ function App() {
         lg: `"nav nav" "aside main"`,
       }}
     >
-      <GridItem area='nav' bg='teal'>
-        Nav
+      <GridItem area='nav'>
+        <Navbar />
       </GridItem>
       <Show breakpoint='(min-width: 768px) and (max-width: 992px)'>
         <GridItem area='slider' bg='pink'>
@@ -27,8 +26,8 @@ function App() {
           Aside
         </GridItem>
       </Show>
-      <GridItem area='main' bg='gold'>
-        Main
+      <GridItem area='main'>
+        <GameGrid></GameGrid>
       </GridItem>
     </Grid>
   );
