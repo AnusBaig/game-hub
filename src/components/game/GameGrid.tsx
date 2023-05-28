@@ -1,5 +1,6 @@
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
+import { Heading, SimpleGrid, Text } from "@chakra-ui/react";
 import useGames from "../../hooks/useGames";
+import GameCard from "./GameCard";
 
 const GameGrid = () => {
   const { games, error } = useGames();
@@ -13,18 +14,15 @@ const GameGrid = () => {
         <Text>{error}</Text>
       ) : (
         <>
-          <VStack spacing='5' padding='0.5 rem'>
+          <SimpleGrid
+            columns={{ sm: 1, md: 2, lg: 2, xl: 3 }}
+            spacing={8}
+            padding='1rem'
+          >
             {games?.map((g) => (
-              <Box key={g.id}>
-                <Heading size='md'>{g.name}</Heading>
-                <Text>Release Date: {g.released}</Text>
-                <Text>
-                  Available on:{" "}
-                  {g.platforms.map((p) => p.platform.name).join(", ")}
-                </Text>
-              </Box>
+              <GameCard key={g.id} game={g} />
             ))}
-          </VStack>
+          </SimpleGrid>
         </>
       )}
     </>

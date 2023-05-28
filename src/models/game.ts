@@ -1,3 +1,4 @@
+import { PlatformObj } from "./PlatformObj";
 import EsrbRating from "./esrbRating";
 import Platform from "./platform";
 
@@ -19,4 +20,5 @@ export default interface Game {
     updated: string;
     esrb_rating: EsrbRating;
     platforms: Platform[];
+    parent_platforms: Platform[]
 }
