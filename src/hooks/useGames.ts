@@ -10,8 +10,10 @@ const useGames = () => {
 
     const [games, setGames] = useState<Game[]>();
     const [error, setError] = useState("");
+    const [isLoading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         apiClient
             .get<FetchGamesResponse>("games")
             .then((res) => {
@@ -21,18 +23,20 @@ const useGames = () => {
                 } else {
                     setError(res.statusText)
                 }
+                setLoading(false);
             }
             )
             .catch((err) => {
                 if (err === CanceledError)
                     return
                 setError(err.message)
+                setLoading(false);
             });
 
         return () => controller.abort();
     }, []);
 
-    return { games, error }
+    return { games, error, isLoading }
 };
 
 export default useGames;

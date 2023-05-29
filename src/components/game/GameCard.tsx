@@ -12,6 +12,7 @@ import Game from "../../models/game";
 import PlatformIconList from "./PlatformIconList";
 import CriticScore from "./CriticScore";
 import ReleaseDate from "./ReleaseDate";
+import getCroppedImageUrl from "../../services/image-url";
 
 interface Props {
   game: Game;
@@ -21,7 +22,7 @@ const GameCard = ({ game }: Props) => {
   return (
     <Card borderRadius={10} textAlign='center' overflow='hidden'>
       <Image
-        src={game.background_image}
+        src={getCroppedImageUrl(game.background_image)}
         alt={"Image for " + game.name}
         height='15rem'
         objectFit='cover'
