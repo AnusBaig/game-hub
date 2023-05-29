@@ -32,7 +32,7 @@ const PlatformIconList = ({ platforms }: Props) => {
   };
 
   return (
-    <HStack spacing={3} margin='auto'>
+    <HStack spacing={3} marginX='auto'>
       {platforms.map(
         ({ platform }, index) =>
           index < 6 && (
