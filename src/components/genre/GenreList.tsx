@@ -1,16 +1,20 @@
 import { Box, HStack, Heading, VStack } from "@chakra-ui/react";
-import useGenres from "../../hooks/useGeneres";
+import Genre from "../../models/genre";
+import useData from "../../hooks/useData";
+import { Endpoints } from "../../constants/endpoints";
 
 const GenreList = () => {
-  const { genres, error, isLoading } = useGenres();
+  const { data, error, isLoading } = useData<Genre>(
+    Endpoints.FETCH_ALL_GENERES
+  );
 
   return (
     <Box padding={4}>
       <Heading mb={6} size='lg'>
         Generes
       </Heading>
-      {genres &&
-        genres.map((genre) => (
+      {data &&
+        data.map((genre) => (
           <VStack spacing={3} key={genre.id}>
             <Box>{genre.name}</Box>
           </VStack>
