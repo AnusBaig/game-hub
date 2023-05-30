@@ -24,7 +24,8 @@ const GameCard = ({ game }: Props) => {
       <Image
         src={getCroppedImageUrl(game.background_image)}
         alt={"Image for " + game.name}
-        height='15rem'
+        minHeight={250}
+        maxHeight={400}
         objectFit='cover'
       />
       <CardBody>
