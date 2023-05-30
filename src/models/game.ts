@@ -1,4 +1,3 @@
-import { PlatformObj } from "./PlatformObj";
 import EsrbRating from "./esrbRating";
 import Platform from "./platform";
 
