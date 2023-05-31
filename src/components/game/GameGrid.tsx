@@ -9,7 +9,7 @@ import { Endpoints } from "../../constants/endpoints";
 const GameGrid = () => {
   const { data, error, isLoading } = useData<Game>(Endpoints.FETCH_ALL_GAMES);
 
-  const skeletons = [1, 2, 3, 4, 5, 6];
+  const skeletons = [...Array(8).keys()];
 
   return (
     <>
