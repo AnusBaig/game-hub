@@ -19,13 +19,13 @@ const GenreList = () => {
       {isLoading
         ? skeletons.map((skeleton) => (
             <GenreItemContainer>
-              <GenreItemSkeleton key={skeleton} />{" "}
+              <GenreItemSkeleton key={skeleton} />
             </GenreItemContainer>
           ))
         : data &&
           data.map((genre) => (
             <GenreItemContainer>
-              <GenreItem key={genre.id} genre={genre} />{" "}
+              <GenreItem key={genre.id} genre={genre} />
             </GenreItemContainer>
           ))}
     </VStack>
