@@ -3,26 +3,31 @@ import Genre from "../../models/genre";
 import useData from "../../hooks/useData";
 import { Endpoints } from "../../constants/endpoints";
 import getCroppedImageUrl from "../../services/image-url";
+import GenreItem from "./GenreItem";
+import GenreItemSkeleton from "./GenreItemSkeleton";
+import GenreItemContainer from "./GenreItemContainer";
 
 const GenreList = () => {
   const { data, error, isLoading } = useData<Genre>(
     Endpoints.FETCH_ALL_GENERES
   );
 
+  const skeletons = [...Array(10).keys()];
+
   return (
     <VStack spacing={6} padding={4} alignItems='start'>
-      {data &&
-        data.map((genre) => (
-          <HStack spacing={4} justifyContent='flex-start'>
-            <Image
-              src={getCroppedImageUrl(genre.image_background)}
-              alt={"Image of " + genre.name}
-              boxSize={10}
-              borderRadius={8}
-            />
-            <Text fontSize='lg'>{genre.name}</Text>
-          </HStack>
-        ))}
+      {isLoading
+        ? skeletons.map((skeleton) => (
+            <GenreItemContainer>
+              <GenreItemSkeleton key={skeleton} />{" "}
+            </GenreItemContainer>
+          ))
+        : data &&
+          data.map((genre) => (
+            <GenreItemContainer>
+              <GenreItem key={genre.id} genre={genre} />{" "}
+            </GenreItemContainer>
+          ))}
     </VStack>
   );
 };
