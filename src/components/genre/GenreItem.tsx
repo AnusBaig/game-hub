@@ -1,13 +1,15 @@
-import { HStack, Image, Text } from "@chakra-ui/react";
+import { Button, Image } from "@chakra-ui/react";
 import getCroppedImageUrl from "../../services/image-url";
 import Genre from "../../models/genre";
 import GenrePicContainer from "./GenrePicContainer";
 
 interface Props {
   genre: Genre;
+  selectedGenre?: Genre;
+  onSelect: (genre: Genre) => void;
 }
 
-const GenreItem = ({ genre }: Props) => {
+const GenreItem = ({ genre, selectedGenre, onSelect }: Props) => {
   return (
     <>
       <GenrePicContainer>
@@ -18,7 +20,15 @@ const GenreItem = ({ genre }: Props) => {
           boxSize='inherit'
         />
       </GenrePicContainer>
-      <Text fontSize='lg'>{genre.name}</Text>
+      <Button
+        bg='none'
+        textAlign='left'
+        fontWeight={genre.id == selectedGenre?.id ? "bold" : "normal"}
+        bgColor={genre.id == selectedGenre?.id ? "gray.500" : ""}
+        onClick={() => onSelect(genre)}
+      >
+        {genre.name}
+      </Button>
     </>
   );
 };

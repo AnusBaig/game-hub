@@ -6,11 +6,7 @@ interface Props {
 }
 
 const GenreItemContainer = ({ children }: Props) => {
-  return (
-    <HStack spacing={4} justifyContent='flex-start'>
-      {children}
-    </HStack>
-  );
+  return <HStack justifyContent='flex-start'>{children}</HStack>;
 };
 
 export default GenreItemContainer;
