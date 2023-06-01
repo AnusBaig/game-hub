@@ -24,6 +24,10 @@ const GameCard = ({ game }: Props) => {
         <Image
           src={getCroppedImageUrl(game.background_image)}
           alt={"Image for " + game.name}
+          minHeight='inherit'
+          maxHeight='inherit'
+          width='100%'
+          objectFit='inherit'
         />
       </GameImageContainer>
       <CardBody>

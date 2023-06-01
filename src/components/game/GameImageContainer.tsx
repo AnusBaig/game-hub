@@ -6,7 +6,7 @@ interface Props {
 }
 const GameImageContainer = ({ children }: Props) => {
   return (
-    <Box minHeight={250} height={280} maxHeight={400} objectFit='cover'>
+    <Box minHeight={250} height={280} maxHeight={300} objectFit='cover'>
       {children}
     </Box>
   );

@@ -22,15 +22,14 @@ const GenreList = ({ selectedGenre, onSelectGenre }: Props) => {
     <VStack spacing={6} padding={4} alignItems='start'>
       {isLoading
         ? skeletons.map((skeleton) => (
-            <GenreItemContainer>
-              <GenreItemSkeleton key={skeleton} />
+            <GenreItemContainer key={skeleton}>
+              <GenreItemSkeleton />
             </GenreItemContainer>
           ))
         : data &&
           data.map((genre) => (
-            <GenreItemContainer>
+            <GenreItemContainer key={genre.id}>
               <GenreItem
-                key={genre.id}
                 genre={genre}
                 selectedGenre={selectedGenre}
                 onSelect={onSelectGenre}
