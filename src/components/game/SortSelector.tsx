@@ -11,6 +11,7 @@ const PlatformSelector = ({ selectedSortOrder, onSelectSortOrder }: Props) => {
     selectedSortOrder && sortOrder == selectedSortOrder;
 
   const sortOrders = [
+    { value: "", label: "Relevacne" },
     { value: "name", label: "Name" },
     { value: "-added", label: "Date Added" },
     { value: "-released", label: "Release Date" },
@@ -19,11 +20,8 @@ const PlatformSelector = ({ selectedSortOrder, onSelectSortOrder }: Props) => {
   ];
 
   const getSelectedOrderLabel = (value?: string) => {
-    let sortOrder = sortOrders.find(
-      (order) =>
-        (order.value[0] == "-" ? order.value.substring(1) : order.value) ==
-        value
-    );
+    let sortOrder = sortOrders.find((order) => order.value == value);
+
     return sortOrder?.label || "Relevance";
   };
 

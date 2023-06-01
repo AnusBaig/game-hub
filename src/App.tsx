@@ -11,7 +11,7 @@ import SortSelector from "./components/game/SortSelector";
 
 function App() {
   const [gameQuery, setGameQuery] = useState({
-    sortOrder: "metacritic",
+    sortOrder: "",
   } as GameQuery);
 
   const handleGenreSelection = (selectedGenre: Genre) =>
