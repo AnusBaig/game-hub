@@ -20,6 +20,8 @@ function App() {
     setGameQuery({ ...gameQuery, platform: selectedPlatform });
   const handleOrderSelection = (selectedOrder: string) =>
     setGameQuery({ ...gameQuery, sortOrder: selectedOrder });
+  const handleSearch = (searchText: string) =>
+    setGameQuery({ ...gameQuery, search: searchText });
 
   return (
     <Grid
@@ -35,7 +37,7 @@ function App() {
       }}
     >
       <GridItem area='nav'>
-        <Navbar />
+        <Navbar onSearch={handleSearch} />
       </GridItem>
       <Show breakpoint='(min-width: 768px) and (max-width: 992px)'>
         <GridItem area='slider' bg='pink'>
