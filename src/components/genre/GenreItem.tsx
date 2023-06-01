@@ -10,6 +10,9 @@ interface Props {
 }
 
 const GenreItem = ({ genre, selectedGenre, onSelect }: Props) => {
+  const isSelectedGenre = (genre: Genre) =>
+    selectedGenre && genre.id == selectedGenre.id;
+
   return (
     <>
       <GenrePicContainer>
@@ -23,8 +26,8 @@ const GenreItem = ({ genre, selectedGenre, onSelect }: Props) => {
       <Button
         bg='none'
         textAlign='left'
-        fontWeight={genre.id == selectedGenre?.id ? "bold" : "normal"}
-        bgColor={genre.id == selectedGenre?.id ? "gray.500" : ""}
+        fontWeight={isSelectedGenre(genre) ? "bold" : "normal"}
+        bgColor={isSelectedGenre(genre) ? "gray.500" : ""}
         onClick={() => onSelect(genre)}
       >
         {genre.name}

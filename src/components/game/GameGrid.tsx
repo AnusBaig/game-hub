@@ -5,9 +5,23 @@ import GameCardContainer from "./GameCardContainer";
 import useData from "../../hooks/useData";
 import Game from "../../models/game";
 import { Endpoints } from "../../constants/endpoints";
+import Genre from "../../models/genre";
+import Platform from "../../models/platform";
 
-const GameGrid = () => {
-  const { data, error, isLoading } = useData<Game>(Endpoints.FETCH_ALL_GAMES);
+interface Props {
+  genre?: Genre;
+  platform?: Platform;
+}
+
+const GameGrid = ({ genre, platform }: Props) => {
+  const { data, error, isLoading } = useData<Game>(
+    Endpoints.FETCH_ALL_GAMES,
+    {
+      genres: genre?.id,
+      platforms: platform?.id,
+    },
+    [platform?.id, genre?.id]
+  );
 
   const skeletons = [...Array(8).keys()];
 

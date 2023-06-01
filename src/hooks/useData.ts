@@ -4,7 +4,7 @@ import { CanceledError } from "axios";
 import apiClient from "../services/api-client";
 import FetchResponse from "../models/responses/fetchResponse";
 
-const useData = <T>(endpoint: string) => {
+const useData = <T>(endpoint: string, requestparams?: any, deps?: any[]) => {
     const controller = new AbortController();
 
     const [data, setData] = useState<T[]>();
@@ -14,7 +14,7 @@ const useData = <T>(endpoint: string) => {
     useEffect(() => {
         setLoading(true);
         apiClient
-            .get<FetchResponse<T>>(endpoint)
+            .get<FetchResponse<T>>(endpoint, { signal: controller.signal, params: { ...requestparams } })
             .then((res) => {
                 if (res && res.status === ResponseStatus.SUCCESS) {
                     setData(res.data.results);
@@ -33,7 +33,7 @@ const useData = <T>(endpoint: string) => {
             });
 
         return () => controller.abort();
-    }, []);
+    }, [...(deps || [])]);
 
     return { data, error, isLoading }
 }

@@ -1,5 +1,5 @@
 import EsrbRating from "./esrbRating";
-import Platform from "./platform";
+import Platform from "./platformDetail";
 
 export default interface Game {
     id: number;

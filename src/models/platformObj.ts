@@ -1,5 +1,5 @@
-import Platform from "./platform";
+import PlatformDetail from "./platformDetail";
 
 export interface PlatformObj {
-    platform: Platform;
+    platform: PlatformDetail;
 }
