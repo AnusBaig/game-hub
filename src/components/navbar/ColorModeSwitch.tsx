@@ -13,7 +13,9 @@ const ColorModeSwitch = () => {
         onChange={toggleColorMode}
       />
       <Show above='sm'>
-        <Text>{(isDarkTheme() ? "Dark" : "Light") + " theme"}</Text>
+        <Text whiteSpace='nowrap'>
+          {(isDarkTheme() ? "Dark" : "Light") + " theme"}
+        </Text>
       </Show>
     </HStack>
   );
