@@ -14,7 +14,7 @@ const useData = <T>(endpoint: string, requestparams?: any, deps?: any[]) => {
     useEffect(() => {
         setLoading(true);
         apiClient
-            .get<FetchResponse<T>>(endpoint, { signal: controller.signal, params: { ...requestparams } })
+            .get<FetchResponse<T>>(endpoint, { params: { ...requestparams } })
             .then((res) => {
                 if (res && res.status === ResponseStatus.SUCCESS) {
                     setData(res.data.results);
