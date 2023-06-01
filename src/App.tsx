@@ -8,6 +8,7 @@ import { useState } from "react";
 import Genre from "./models/genre";
 import GameQuery from "./models/queries/gameQuery";
 import SortSelector from "./components/game/SortSelector";
+import GameHeading from "./components/game/GameHeading";
 
 function App() {
   const [gameQuery, setGameQuery] = useState({
@@ -53,20 +54,23 @@ function App() {
         </GridItem>
       </Show>
       <GridItem area='main'>
-        <Hide below='sm'>
-          <Flex px={4} mb={4}>
-            <Box mr={5}>
-              <PlatformSelector
-                selectedPlatform={gameQuery.platform}
-                onSelectPlatform={handlePlatformSelection}
+        <Box px={4}>
+          <GameHeading gameQuery={gameQuery} />
+          <Hide below='sm'>
+            <Flex mb={4}>
+              <Box mr={5}>
+                <PlatformSelector
+                  selectedPlatform={gameQuery.platform}
+                  onSelectPlatform={handlePlatformSelection}
+                />
+              </Box>
+              <SortSelector
+                selectedSortOrder={gameQuery.sortOrder}
+                onSelectSortOrder={handleOrderSelection}
               />
-            </Box>
-            <SortSelector
-              selectedSortOrder={gameQuery.sortOrder}
-              onSelectSortOrder={handleOrderSelection}
-            />
-          </Flex>
-        </Hide>
+            </Flex>
+          </Hide>
+        </Box>
         <GameGrid gameQuery={gameQuery} />
       </GridItem>
     </Grid>
