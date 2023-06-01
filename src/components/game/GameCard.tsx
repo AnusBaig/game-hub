@@ -1,18 +1,16 @@
 import {
-  Box,
   Card,
   CardBody,
   CardFooter,
   HStack,
   Heading,
   Image,
-  Text,
 } from "@chakra-ui/react";
 import Game from "../../models/game";
 import PlatformIconList from "./PlatformIconList";
 import CriticScore from "./CriticScore";
 import ReleaseDate from "./ReleaseDate";
-import getCroppedImageUrl from "../../services/image-url";
+import getCroppedImageUrl from "../../services/imagUrl";
 import GameImageContainer from "./GameImageContainer";
 
 interface Props {

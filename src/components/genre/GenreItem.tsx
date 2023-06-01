@@ -1,5 +1,5 @@
 import { Button, Image } from "@chakra-ui/react";
-import getCroppedImageUrl from "../../services/image-url";
+import getCroppedImageUrl from "../../services/imagUrl";
 import Genre from "../../models/genre";
 import GenrePicContainer from "./GenrePicContainer";
 

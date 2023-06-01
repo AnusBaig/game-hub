@@ -19,7 +19,11 @@ const PlatformSelector = ({ selectedSortOrder, onSelectSortOrder }: Props) => {
   ];
 
   const getSelectedOrderLabel = (value?: string) => {
-    let sortOrder = sortOrders.find((order) => order.value == value);
+    let sortOrder = sortOrders.find(
+      (order) =>
+        (order.value[0] == "-" ? order.value.substring(1) : order.value) ==
+        value
+    );
     return sortOrder?.label || "Relevance";
   };
 
