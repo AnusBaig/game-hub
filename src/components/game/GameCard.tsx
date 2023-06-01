@@ -13,6 +13,7 @@ import PlatformIconList from "./PlatformIconList";
 import CriticScore from "./CriticScore";
 import ReleaseDate from "./ReleaseDate";
 import getCroppedImageUrl from "../../services/image-url";
+import GameImageContainer from "./GameImageContainer";
 
 interface Props {
   game: Game;
@@ -21,12 +22,12 @@ interface Props {
 const GameCard = ({ game }: Props) => {
   return (
     <Card borderRadius={10} textAlign='center' overflow='hidden'>
-      <Image
-        src={getCroppedImageUrl(game.background_image)}
-        alt={"Image for " + game.name}
-        height='15rem'
-        objectFit='cover'
-      />
+      <GameImageContainer>
+        <Image
+          src={getCroppedImageUrl(game.background_image)}
+          alt={"Image for " + game.name}
+        />
+      </GameImageContainer>
       <CardBody>
         <Heading fontSize='2xl'>{game.name}</Heading>
         <HStack justifyContent='space-between'>

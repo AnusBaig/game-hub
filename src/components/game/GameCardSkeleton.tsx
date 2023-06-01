@@ -5,18 +5,21 @@ import {
   Skeleton,
   SkeletonText,
 } from "@chakra-ui/react";
+import GameImageContainer from "./GameImageContainer";
 
 const GameCardSkeleton = () => {
   return (
     <Card>
-      <Skeleton>
-        <CardBody>
-          <SkeletonText mt={4} noOfLines={6} spacing={4} />
-        </CardBody>
-        <CardFooter>
-          <SkeletonText noOfLines={4} spacing={4} />
-        </CardFooter>
-      </Skeleton>
+      <GameImageContainer>
+        <Skeleton height='inherit' />
+      </GameImageContainer>
+      <CardBody>
+        <Skeleton mx={14} mb={6} height={8} borderRadius={5} />
+        <SkeletonText mt={4} noOfLines={3} spacing={3} />
+      </CardBody>
+      <CardFooter>
+        <SkeletonText noOfLines={1} />
+      </CardFooter>
     </Card>
   );
 };
