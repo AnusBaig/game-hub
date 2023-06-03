@@ -12,6 +12,7 @@ import CriticScore from "./CriticScore";
 import ReleaseDate from "./ReleaseDate";
 import getCroppedImageUrl from "../../services/imagUrl";
 import GameImageContainer from "./GameImageContainer";
+import Rating from "./Rating";
 
 interface Props {
   game: Game;
@@ -38,6 +39,7 @@ const GameCard = ({ game }: Props) => {
         </HStack>
       </CardBody>
       <CardFooter>
+        <Rating rating={game.rating_top} />
         <PlatformIconList platforms={game.parent_platforms} />
       </CardFooter>
     </Card>
