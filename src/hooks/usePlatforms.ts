@@ -1,7 +1,13 @@
-import { Endpoints } from "../constants/endpoints";
+import platforms from "../data/platforms";
 import Platform from "../models/platform";
-import useData from "./useData";
+import HookResponse from "../models/responses/hookResponse";
 
-const usePlatforms = () => useData<Platform>(Endpoints.FETCH_PARENT_PLATFORMS);
+const usePlatforms = (): HookResponse<Platform[]> => {
+  return {
+    data: platforms,
+    isLoading: false,
+    error: platforms && platforms.length > 0 ? null : "No platform available",
+  };
+};
 
 export default usePlatforms;

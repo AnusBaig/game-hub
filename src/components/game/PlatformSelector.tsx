@@ -11,10 +11,13 @@ interface Props {
 const PlatformSelector = ({ selectedPlatform, onSelectPlatform }: Props) => {
   const { data, error } = usePlatforms();
 
+  if (error) {
+    console.log(error);
+    return null;
+  }
+
   const isSelectedPlatform = (platform: Platform) =>
     selectedPlatform && platform.slug == selectedPlatform.slug;
-
-  if (error) return null;
 
   return (
     <Menu>
