@@ -1,10 +1,9 @@
 import { Box, Heading, VStack } from "@chakra-ui/react";
 import Genre from "../../models/genre";
-import useData from "../../hooks/useData";
-import { Endpoints } from "../../constants/endpoints";
 import GenreItem from "./GenreItem";
 import GenreItemSkeleton from "./GenreItemSkeleton";
 import GenreItemContainer from "./GenreItemContainer";
+import useGeneres from "../../hooks/useGenres";
 
 interface Props {
   selectedGenre?: Genre;
@@ -12,9 +11,7 @@ interface Props {
 }
 
 const GenreList = ({ selectedGenre, onSelectGenre }: Props) => {
-  const { data, error, isLoading } = useData<Genre>(
-    Endpoints.FETCH_ALL_GENERES
-  );
+  const { data, error, isLoading } = useGeneres();
 
   const skeletons = [...Array(10).keys()];
 
