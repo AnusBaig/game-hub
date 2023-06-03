@@ -9,6 +9,7 @@ import Genre from "./models/genre";
 import GameQuery from "./models/queries/gameQuery";
 import SortSelector from "./components/game/SortSelector";
 import GameHeading from "./components/game/GameHeading";
+import GenreHeading from "./components/genre/GenreHeading";
 
 function App() {
   const [gameQuery, setGameQuery] = useState({
@@ -46,31 +47,30 @@ function App() {
         </GridItem>
       </Show>
       <Show above='lg'>
-        <GridItem area='aside'>
+        <GridItem area='aside' padding={4}>
+          <GenreHeading />
           <GenreList
             selectedGenre={gameQuery.genre}
             onSelectGenre={handleGenreSelection}
           />
         </GridItem>
       </Show>
-      <GridItem area='main'>
-        <Box px={4}>
-          <GameHeading gameQuery={gameQuery} />
-          <Hide below='sm'>
-            <Flex mb={4}>
-              <Box mr={5}>
-                <PlatformSelector
-                  selectedPlatform={gameQuery.platform}
-                  onSelectPlatform={handlePlatformSelection}
-                />
-              </Box>
-              <SortSelector
-                selectedSortOrder={gameQuery.sortOrder}
-                onSelectSortOrder={handleOrderSelection}
+      <GridItem area='main' px={4}>
+        <GameHeading gameQuery={gameQuery} />
+        <Hide below='sm'>
+          <Flex mb={4}>
+            <Box mr={5}>
+              <PlatformSelector
+                selectedPlatform={gameQuery.platform}
+                onSelectPlatform={handlePlatformSelection}
               />
-            </Flex>
-          </Hide>
-        </Box>
+            </Box>
+            <SortSelector
+              selectedSortOrder={gameQuery.sortOrder}
+              onSelectSortOrder={handleOrderSelection}
+            />
+          </Flex>
+        </Hide>
         <GameGrid gameQuery={gameQuery} />
       </GridItem>
     </Grid>

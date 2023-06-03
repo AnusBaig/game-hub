@@ -1,4 +1,4 @@
-import { Box, Heading, VStack } from "@chakra-ui/react";
+import { Box, Heading, VStack, Text } from "@chakra-ui/react";
 import Genre from "../../models/genre";
 import GenreItem from "./GenreItem";
 import GenreItemSkeleton from "./GenreItemSkeleton";
@@ -15,11 +15,10 @@ const GenreList = ({ selectedGenre, onSelectGenre }: Props) => {
 
   const skeletons = [...Array(10).keys()];
 
+  if (error) return <Text>{error}</Text>;
+
   return (
-    <Box padding={4}>
-      <Heading as='h4' fontSize='2xl' mb={3}>
-        Genres
-      </Heading>
+    <Box>
       <VStack spacing={6} alignItems='start'>
         {isLoading
           ? skeletons.map((skeleton) => (

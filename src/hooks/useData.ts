@@ -38,7 +38,11 @@ const useData = <T>(
     return () => controller.abort();
   }, [...(deps || [])]);
 
-  return { data, error, isLoading };
+  return {
+    data,
+    error: data && data.length > 0 ? null : error || "No data available",
+    isLoading,
+  };
 };
 
 export default useData;
