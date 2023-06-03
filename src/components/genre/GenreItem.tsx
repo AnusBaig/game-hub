@@ -21,11 +21,13 @@ const GenreItem = ({ genre, selectedGenre, onSelect }: Props) => {
           alt={"Image of " + genre.name}
           borderRadius='inherit'
           boxSize='inherit'
+          objectFit='cover'
         />
       </GenrePicContainer>
       <Button
         bg='none'
         textAlign='left'
+        whiteSpace='normal'
         fontWeight={isSelectedGenre(genre) ? "bold" : "normal"}
         bgColor={isSelectedGenre(genre) ? "gray.500" : ""}
         onClick={() => onSelect(genre)}
