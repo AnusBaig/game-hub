@@ -10,6 +10,7 @@ import GameQuery from "./models/queries/gameQuery";
 import SortSelector from "./components/game/SortSelector";
 import GameHeading from "./components/game/GameHeading";
 import GenreHeading from "./components/genre/GenreHeading";
+import "./App.css";
 
 function App() {
   const [gameQuery, setGameQuery] = useState({
