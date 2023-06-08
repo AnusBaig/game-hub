@@ -10,12 +10,13 @@ const useData = <T>(
   endpoint: Endpoints,
   key: CacheKeys,
   requestparams?: object,
-  queryConfig?: queryConfig
+  queryConfig?: queryConfig,
+  deps?: any[]
 ): HookResponse<T[]> => {
   var client = new ApiClient<FetchResponse<T>>(endpoint);
 
   const { data, error, isLoading } = useQuery<FetchResponse<T>, Error>({
-    queryKey: [key],
+    queryKey: [key, ...(deps || [])],
     queryFn: () => client.getAll(requestparams),
     staleTime: 2 * 60 * 1000, // 2 min
     retry: 4,
@@ -25,8 +26,7 @@ const useData = <T>(
 
   return {
     data: data?.results,
-    error:
-      data && data?.count > 0 ? null : error?.message || "No data available",
+    error: data?.count ? null : error?.message || "No data available",
     isLoading,
   };
 };

@@ -15,6 +15,8 @@ import "./App.css";
 function App() {
   const [gameQuery, setGameQuery] = useState({
     sortOrder: "",
+    page: 1,
+    pageSize: 12,
   } as GameQuery);
 
   const handleGenreSelection = (selectedGenre: Genre) =>
