@@ -11,8 +11,14 @@ interface Props {
 }
 
 const GameGrid = ({ gameQuery }: Props) => {
-  const { data, error, fetchNextPage, isLoading, isFetching } =
-    useGames(gameQuery);
+  const {
+    data,
+    error,
+    fetchNextPage,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useGames(gameQuery);
 
   const skeletons = [...Array(8).keys()];
 
@@ -41,10 +47,12 @@ const GameGrid = ({ gameQuery }: Props) => {
           </GameCardContainer>
         ))}
       </SimpleGrid>
-      <LoadMore
-        isLoading={isFetching}
-        onClick={() => fetchNextPage && fetchNextPage()}
-      />
+      {hasNextPage && (
+        <LoadMore
+          isLoading={isFetchingNextPage}
+          onClick={() => fetchNextPage && fetchNextPage()}
+        />
+      )}
     </>
   );
 };

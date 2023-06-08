@@ -16,18 +16,24 @@ const useInfiniteData = <T>(
 ): HookResponse<T[]> => {
   var client = new ApiClient<FetchResponse<T>>(endpoint);
 
-  const { data, error, fetchNextPage, isLoading, isFetching } =
-    useInfiniteQuery<FetchResponse<T>, Error>({
-      queryKey: [key, ...(deps || [])],
-      queryFn: (pageConfig) =>
-        client.getAll({ ...requestparams, page: pageConfig.pageParam }),
-      getNextPageParam: (lastPage, allPages) =>
-        lastPage.count > 0 ? allPages.length : undefined,
-      staleTime: 2 * 60 * 1000, // 2 min
-      retry: 4,
-      keepPreviousData: true,
-      ...queryConfig,
-    });
+  const {
+    data,
+    error,
+    fetchNextPage,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+  } = useInfiniteQuery<FetchResponse<T>, Error>({
+    queryKey: [key, ...(deps || [])],
+    queryFn: ({ pageParam = 1 }) =>
+      client.getAll({ ...requestparams, page: pageParam }),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.next ? allPages.length + 1 : undefined,
+    staleTime: 2 * 60 * 1000, // 2 min
+    retry: 4,
+    keepPreviousData: true,
+    ...queryConfig,
+  });
 
   return {
     data: _.flatten(data?.pages.map((page) => page.results)),
@@ -36,8 +42,9 @@ const useInfiniteData = <T>(
         ? null
         : error?.message || "No data available",
     isLoading,
-    isFetching,
+    isFetchingNextPage,
     fetchNextPage,
+    hasNextPage,
   };
 };
 

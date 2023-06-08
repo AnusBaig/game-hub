@@ -1,7 +1,8 @@
 export default interface HookResponse<T> {
   data?: T;
   isLoading: boolean;
-  isFetching?: boolean;
-  error: string | null;
+  isFetchingNextPage?: boolean;
+  hasNextPage?: boolean;
   fetchNextPage?: () => void;
+  error: string | null;
 }
