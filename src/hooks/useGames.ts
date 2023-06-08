@@ -17,7 +17,9 @@ const useGames = (gameQuery: GameQuery): HookResponse<Game[]> => {
       page: gameQuery.page,
       page_size: gameQuery.pageSize,
     },
-    undefined,
+    {
+      staleTime: 3 * 60 * 60 * 1000, // 3h
+    },
     [gameQuery]
   );
 };
