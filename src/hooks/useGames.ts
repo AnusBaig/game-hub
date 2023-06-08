@@ -10,8 +10,8 @@ const useGames = (gameQuery: GameQuery): HookResponse<Game[]> => {
     Endpoints.FETCH_ALL_GAMES,
     CacheKeys.GAMES_KEY,
     {
-      genres: gameQuery.genre?.id,
-      platforms: gameQuery.platform?.id,
+      genres: gameQuery.genreId,
+      platforms: gameQuery.platformId,
       ordering: gameQuery.sortOrder,
       search: gameQuery.search,
       page: gameQuery.page,

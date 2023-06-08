@@ -5,13 +5,12 @@ import GenrePicContainer from "./GenrePicContainer";
 
 interface Props {
   genre: Genre;
-  selectedGenre?: Genre;
+  selectedGenreId?: number;
   onSelect: (genre: Genre) => void;
 }
 
-const GenreItem = ({ genre, selectedGenre, onSelect }: Props) => {
-  const isSelectedGenre = (genre: Genre) =>
-    selectedGenre && genre.id == selectedGenre.id;
+const GenreItem = ({ genre, selectedGenreId, onSelect }: Props) => {
+  const isSelectedGenre = (genre: Genre) => genre.id == selectedGenreId;
 
   return (
     <>

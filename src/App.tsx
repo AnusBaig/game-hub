@@ -14,15 +14,15 @@ import GameQuery from "./models/queries/gameQuery";
 
 function App() {
   const [gameQuery, setGameQuery] = useState({
-    sortOrder: "",
+    sortOrder: "", // sort by relevance
     page: 1,
     pageSize: 12,
   } as GameQuery);
 
   const handleGenreSelection = (selectedGenre: Genre) =>
-    setGameQuery({ ...gameQuery, genre: selectedGenre });
+    setGameQuery({ ...gameQuery, genreId: selectedGenre.id });
   const handlePlatformSelection = (selectedPlatform: Platform) =>
-    setGameQuery({ ...gameQuery, platform: selectedPlatform });
+    setGameQuery({ ...gameQuery, platformId: selectedPlatform.id });
   const handleOrderSelection = (selectedOrder: string) =>
     setGameQuery({ ...gameQuery, sortOrder: selectedOrder });
   const handleSearch = (searchText: string) =>
@@ -53,7 +53,7 @@ function App() {
         <GridItem area='aside' padding={4}>
           <GenreHeading />
           <GenreList
-            selectedGenre={gameQuery.genre}
+            selectedGenreId={gameQuery.genreId}
             onSelectGenre={handleGenreSelection}
           />
         </GridItem>
@@ -64,7 +64,7 @@ function App() {
           <Flex mb={4}>
             <Box mr={5}>
               <PlatformSelector
-                selectedPlatform={gameQuery.platform}
+                selectedPlatformId={gameQuery.platformId}
                 onSelectPlatform={handlePlatformSelection}
               />
             </Box>
