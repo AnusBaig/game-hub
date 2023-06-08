@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { CacheKeys } from "../constants/cacheKeys";
 import { Endpoints } from "../constants/endpoints";
 import queryConfig from "../models/config/queryConfig";
+import FetchResponse from "../models/responses/fetchResponse";
 import HookResponse from "../models/responses/hookResponse";
 import ApiClient from "../services/apiClient";
-import FetchResponse from "../models/responses/fetchResponse";
 
 const useData = <T>(
   endpoint: Endpoints,
@@ -26,9 +26,7 @@ const useData = <T>(
   return {
     data: data?.results,
     error:
-      data?.results && data?.results.length > 0
-        ? null
-        : error?.message || "No data available",
+      data && data?.count > 0 ? null : error?.message || "No data available",
     isLoading,
   };
 };
