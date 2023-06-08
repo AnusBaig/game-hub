@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/button";
-import { Box, Spinner } from "@chakra-ui/react";
-import Loader from "../Loader";
+import { Box } from "@chakra-ui/react";
+import Loader from "../utils/Loader";
 
 interface Props {
   isLoading?: boolean;
