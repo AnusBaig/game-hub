@@ -15,7 +15,7 @@ const GenreList = ({ selectedGenre, onSelectGenre }: Props) => {
 
   const skeletons = [...Array(10).keys()];
 
-  if (error) return <Text>{error}</Text>;
+  if (error && isLoading) return <Text>{error}</Text>;
 
   return (
     <Box>
@@ -26,8 +26,7 @@ const GenreList = ({ selectedGenre, onSelectGenre }: Props) => {
                 <GenreItemSkeleton />
               </GenreItemContainer>
             ))
-          : data &&
-            data.map((genre) => (
+          : data?.map((genre) => (
               <GenreItemContainer key={genre.id}>
                 <GenreItem
                   genre={genre}

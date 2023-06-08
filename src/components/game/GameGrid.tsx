@@ -14,7 +14,7 @@ const GameGrid = ({ gameQuery }: Props) => {
 
   const skeletons = [...Array(8).keys()];
 
-  if (error)
+  if (error && !isLoading)
     return (
       <Text as='h4' textAlign='center'>
         {error}

@@ -1,5 +1,5 @@
 export default interface HookResponse<T> {
-  data: T | null;
+  data?: T;
   isLoading: boolean;
   error: string | null;
 }
