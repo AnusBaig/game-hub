@@ -6,16 +6,16 @@ import GenreItemContainer from "./GenreItemContainer";
 import useGeneres from "../../hooks/useGenres";
 
 interface Props {
-  selectedGenre?: Genre;
+  selectedGenreId?: number;
   onSelectGenre: (genre: Genre) => void;
 }
 
-const GenreList = ({ selectedGenre, onSelectGenre }: Props) => {
+const GenreList = ({ selectedGenreId, onSelectGenre }: Props) => {
   const { data, error, isLoading } = useGeneres();
 
   const skeletons = [...Array(10).keys()];
 
-  if (error) return <Text>{error}</Text>;
+  if (error && isLoading) return <Text>{error}</Text>;
 
   return (
     <Box>
@@ -26,12 +26,11 @@ const GenreList = ({ selectedGenre, onSelectGenre }: Props) => {
                 <GenreItemSkeleton />
               </GenreItemContainer>
             ))
-          : data &&
-            data.map((genre) => (
+          : data?.map((genre) => (
               <GenreItemContainer key={genre.id}>
                 <GenreItem
                   genre={genre}
-                  selectedGenre={selectedGenre}
+                  selectedGenreId={selectedGenreId}
                   onSelect={onSelectGenre}
                 />
               </GenreItemContainer>

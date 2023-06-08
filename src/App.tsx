@@ -1,26 +1,28 @@
 import { Box, Flex, Grid, GridItem, Hide, Show } from "@chakra-ui/react";
-import Navbar from "./components/navbar/Navbar";
-import GameGrid from "./components/game/GameGrid";
-import GenreList from "./components/genre/GenreList";
-import PlatformSelector from "./components/game/PlatformSelector";
-import Platform from "./models/platform";
 import { useState } from "react";
-import Genre from "./models/genre";
-import GameQuery from "./models/queries/gameQuery";
-import SortSelector from "./components/game/SortSelector";
-import GameHeading from "./components/game/GameHeading";
-import GenreHeading from "./components/genre/GenreHeading";
 import "./App.css";
+import GameGrid from "./components/game/GameGrid";
+import GameHeading from "./components/game/GameHeading";
+import PlatformSelector from "./components/game/PlatformSelector";
+import SortSelector from "./components/game/SortSelector";
+import GenreHeading from "./components/genre/GenreHeading";
+import GenreList from "./components/genre/GenreList";
+import Navbar from "./components/navbar/Navbar";
+import Genre from "./models/genre";
+import Platform from "./models/platform";
+import GameQuery from "./models/queries/gameQuery";
 
 function App() {
   const [gameQuery, setGameQuery] = useState({
-    sortOrder: "",
+    sortOrder: "", // sort by relevance
+    page: 1,
+    pageSize: 12,
   } as GameQuery);
 
   const handleGenreSelection = (selectedGenre: Genre) =>
-    setGameQuery({ ...gameQuery, genre: selectedGenre });
+    setGameQuery({ ...gameQuery, genreId: selectedGenre.id });
   const handlePlatformSelection = (selectedPlatform: Platform) =>
-    setGameQuery({ ...gameQuery, platform: selectedPlatform });
+    setGameQuery({ ...gameQuery, platformId: selectedPlatform.id });
   const handleOrderSelection = (selectedOrder: string) =>
     setGameQuery({ ...gameQuery, sortOrder: selectedOrder });
   const handleSearch = (searchText: string) =>
@@ -51,7 +53,7 @@ function App() {
         <GridItem area='aside' padding={4}>
           <GenreHeading />
           <GenreList
-            selectedGenre={gameQuery.genre}
+            selectedGenreId={gameQuery.genreId}
             onSelectGenre={handleGenreSelection}
           />
         </GridItem>
@@ -62,7 +64,7 @@ function App() {
           <Flex mb={4}>
             <Box mr={5}>
               <PlatformSelector
-                selectedPlatform={gameQuery.platform}
+                selectedPlatformId={gameQuery.platformId}
                 onSelectPlatform={handlePlatformSelection}
               />
             </Box>

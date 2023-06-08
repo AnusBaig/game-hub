@@ -1,46 +1,33 @@
-import { useEffect, useState } from "react";
-import { ResponseStatus } from "../constants/responseStatus";
-import { CanceledError } from "axios";
-import apiClient from "../services/api-client";
+import { useQuery } from "@tanstack/react-query";
+import ms from "ms";
+import { CacheKeys } from "../constants/cacheKeys";
+import { Endpoints } from "../constants/endpoints";
+import queryConfig from "../models/config/queryConfig";
 import FetchResponse from "../models/responses/fetchResponse";
 import HookResponse from "../models/responses/hookResponse";
+import ApiClient from "../services/apiClient";
 
 const useData = <T>(
-  endpoint: string,
-  requestparams?: any,
+  endpoint: Endpoints,
+  key: CacheKeys,
+  requestparams?: object,
+  queryConfig?: queryConfig,
   deps?: any[]
 ): HookResponse<T[]> => {
-  const controller = new AbortController();
+  var client = new ApiClient<FetchResponse<T>>(endpoint);
 
-  const [data, setData] = useState<T[] | null>(null);
-  const [error, setError] = useState("");
-  const [isLoading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    apiClient
-      .get<FetchResponse<T>>(endpoint, { params: { ...requestparams } })
-      .then((res) => {
-        if (res && res.status === ResponseStatus.SUCCESS) {
-          setData(res.data.results);
-          setError("");
-        } else {
-          setError(res.statusText);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (err === CanceledError) return;
-        setError(err.message);
-        setLoading(false);
-      });
-
-    return () => controller.abort();
-  }, [...(deps || [])]);
+  const { data, error, isLoading } = useQuery<FetchResponse<T>, Error>({
+    queryKey: [key, ...(deps || [])],
+    queryFn: () => client.getAll(requestparams),
+    staleTime: ms("2m"),
+    retry: 4,
+    keepPreviousData: true,
+    ...queryConfig,
+  });
 
   return {
-    data,
-    error: data && data.length > 0 ? null : error || "No data available",
+    data: data?.results,
+    error: data?.count ? null : error?.message || "No data available",
     isLoading,
   };
 };
