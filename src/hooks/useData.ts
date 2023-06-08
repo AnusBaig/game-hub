@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import ms from "ms";
 import { CacheKeys } from "../constants/cacheKeys";
 import { Endpoints } from "../constants/endpoints";
 import queryConfig from "../models/config/queryConfig";
@@ -18,7 +19,7 @@ const useData = <T>(
   const { data, error, isLoading } = useQuery<FetchResponse<T>, Error>({
     queryKey: [key, ...(deps || [])],
     queryFn: () => client.getAll(requestparams),
-    staleTime: 2 * 60 * 1000, // 2 min
+    staleTime: ms("2m"),
     retry: 4,
     keepPreviousData: true,
     ...queryConfig,

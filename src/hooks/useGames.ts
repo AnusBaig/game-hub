@@ -1,3 +1,4 @@
+import ms from "ms";
 import { CacheKeys } from "../constants/cacheKeys";
 import { Endpoints } from "../constants/endpoints";
 import Game from "../models/game";
@@ -17,9 +18,7 @@ const useGames = (gameQuery: GameQuery): HookResponse<Game[]> => {
       page: gameQuery.page,
       page_size: gameQuery.pageSize,
     },
-    {
-      staleTime: 3 * 60 * 60 * 1000, // 3h
-    },
+    { staleTime: ms("6h") },
     [gameQuery]
   );
 };

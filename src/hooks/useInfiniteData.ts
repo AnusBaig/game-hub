@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import _ from "lodash";
+import ms from "ms";
 import { CacheKeys } from "../constants/cacheKeys";
 import { Endpoints } from "../constants/endpoints";
 import queryConfig from "../models/config/queryConfig";
@@ -29,7 +30,7 @@ const useInfiniteData = <T>(
       client.getAll({ ...requestparams, page: pageParam }),
     getNextPageParam: (lastPage, allPages) =>
       lastPage.next ? allPages.length + 1 : undefined,
-    staleTime: 2 * 60 * 1000, // 2 min
+    staleTime: ms("10m"),
     retry: 4,
     keepPreviousData: true,
     ...queryConfig,
