@@ -1,5 +1,4 @@
 import { Box, Flex, Grid, GridItem, Hide, Show } from "@chakra-ui/react";
-import { useState } from "react";
 import "./App.css";
 import GameGrid from "./components/game/GameGrid";
 import GameHeading from "./components/game/GameHeading";
@@ -8,17 +7,8 @@ import SortSelector from "./components/game/SortSelector";
 import GenreHeading from "./components/genre/GenreHeading";
 import GenreList from "./components/genre/GenreList";
 import Navbar from "./components/navbar/Navbar";
-import Genre from "./models/genre";
-import Platform from "./models/platform";
-import GameQuery from "./models/queries/gameQuery";
 
 function App() {
-  // const [gameQuery, setGameQuery] = useState({
-  //   sortOrder: "", // sort by relevance
-  //   page: 1,
-  //   pageSize: 12,
-  // } as GameQuery);
-
   return (
     <Grid
       templateAreas={{

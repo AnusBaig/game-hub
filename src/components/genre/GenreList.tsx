@@ -1,9 +1,8 @@
-import { Box, Heading, VStack, Text } from "@chakra-ui/react";
-import Genre from "../../models/genre";
-import GenreItem from "./GenreItem";
-import GenreItemSkeleton from "./GenreItemSkeleton";
-import GenreItemContainer from "./GenreItemContainer";
+import { Box, Text, VStack } from "@chakra-ui/react";
 import useGeneres from "../../hooks/useGenres";
+import GenreItem from "./GenreItem";
+import GenreItemContainer from "./GenreItemContainer";
+import GenreItemSkeleton from "./GenreItemSkeleton";
 
 const GenreList = () => {
   const { data, error, isLoading } = useGeneres();

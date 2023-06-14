@@ -9,10 +9,8 @@ interface Props {
 }
 
 const GenreItem = ({ genre }: Props) => {
-  const {
-    gameQuery: { genreId },
-    setGenreId,
-  } = useGameQueryStore();
+  const genreId = useGameQueryStore((s) => s.gameQuery.genreId);
+  const setGenreId = useGameQueryStore((s) => s.setGenreId);
 
   const isSelectedGenre = (genre: Genre) => genre.id == genreId;
 

@@ -3,10 +3,8 @@ import { BsChevronDown } from "react-icons/bs";
 import useGameQueryStore from "../../store";
 
 const PlatformSelector = () => {
-  const {
-    gameQuery: { sortOrder },
-    setSortOrder,
-  } = useGameQueryStore();
+  const sortOrder = useGameQueryStore((s) => s.gameQuery.sortOrder);
+  const setSortOrder = useGameQueryStore((s) => s.setSortOrder);
 
   const isSelectedSort = (selectedOrder: string) =>
     sortOrder && selectedOrder == sortOrder;

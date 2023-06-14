@@ -8,7 +8,7 @@ const SearchInput = () => {
     mode: "all",
   });
 
-  const { setSearch } = useGameQueryStore();
+  const setSearch = useGameQueryStore((s) => s.setSearch);
 
   const inputName = "searchInput";
   return (
