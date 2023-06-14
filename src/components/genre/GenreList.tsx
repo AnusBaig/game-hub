@@ -5,12 +5,7 @@ import GenreItemSkeleton from "./GenreItemSkeleton";
 import GenreItemContainer from "./GenreItemContainer";
 import useGeneres from "../../hooks/useGenres";
 
-interface Props {
-  selectedGenreId?: number;
-  onSelectGenre: (genre: Genre) => void;
-}
-
-const GenreList = ({ selectedGenreId, onSelectGenre }: Props) => {
+const GenreList = () => {
   const { data, error, isLoading } = useGeneres();
 
   const skeletons = [...Array(10).keys()];
@@ -28,11 +23,7 @@ const GenreList = ({ selectedGenreId, onSelectGenre }: Props) => {
             ))
           : data?.map((genre) => (
               <GenreItemContainer key={genre.id}>
-                <GenreItem
-                  genre={genre}
-                  selectedGenreId={selectedGenreId}
-                  onSelect={onSelectGenre}
-                />
+                <GenreItem genre={genre} />
               </GenreItemContainer>
             ))}
       </VStack>
