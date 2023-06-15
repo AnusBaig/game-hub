@@ -1,3 +1,4 @@
+import { mountStoreDevtool } from "simple-zustand-devtools";
 import { create } from "zustand";
 import GameQuery from "./models/queries/gameQuery";
 
@@ -43,5 +44,8 @@ const useGameQueryStore = create<GameQueryStore>((set) => ({
       },
     })),
 }));
+
+if (process.env.NODE_ENV === "development")
+  mountStoreDevtool("Game Query Store", useGameQueryStore);
 
 export default useGameQueryStore;
