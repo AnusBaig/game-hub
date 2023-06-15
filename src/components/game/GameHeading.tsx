@@ -16,7 +16,6 @@ const GameHeading = () => {
       {heading}
     </Heading>
   );
-  s;
 };
 
 export default GameHeading;
