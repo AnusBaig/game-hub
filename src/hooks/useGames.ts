@@ -2,11 +2,13 @@ import ms from "ms";
 import { CacheKeys } from "../constants/cacheKeys";
 import { Endpoints } from "../constants/endpoints";
 import Game from "../models/game";
-import GameQuery from "../models/queries/gameQuery";
 import HookResponse from "../models/responses/hookResponse";
+import useGameQueryStore from "../store";
 import useInfiniteData from "./useInfiniteData";
 
-const useGames = (gameQuery: GameQuery): HookResponse<Game[]> => {
+const useGames = (): HookResponse<Game[]> => {
+  const gameQuery = useGameQueryStore((s) => s.gameQuery);
+
   return useInfiniteData<Game>(
     Endpoints.FETCH_ALL_GAMES,
     CacheKeys.GAMES_KEY,

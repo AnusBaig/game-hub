@@ -1,16 +1,18 @@
 import { Button, Image } from "@chakra-ui/react";
-import getCroppedImageUrl from "../../services/imagUrl";
 import Genre from "../../models/genre";
+import getCroppedImageUrl from "../../services/imagUrl";
+import useGameQueryStore from "../../store";
 import GenrePicContainer from "./GenrePicContainer";
 
 interface Props {
   genre: Genre;
-  selectedGenreId?: number;
-  onSelect: (genre: Genre) => void;
 }
 
-const GenreItem = ({ genre, selectedGenreId, onSelect }: Props) => {
-  const isSelectedGenre = (genre: Genre) => genre.id == selectedGenreId;
+const GenreItem = ({ genre }: Props) => {
+  const genreId = useGameQueryStore((s) => s.gameQuery.genreId);
+  const setGenreId = useGameQueryStore((s) => s.setGenreId);
+
+  const isSelectedGenre = (genre: Genre) => genre.id == genreId;
 
   return (
     <>
@@ -29,7 +31,7 @@ const GenreItem = ({ genre, selectedGenreId, onSelect }: Props) => {
         whiteSpace='normal'
         fontWeight={isSelectedGenre(genre) ? "bold" : "normal"}
         bgColor={isSelectedGenre(genre) ? "gray.500" : ""}
-        onClick={() => onSelect(genre)}
+        onClick={() => setGenreId(genre.id)}
       >
         {genre.name}
       </Button>

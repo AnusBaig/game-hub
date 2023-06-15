@@ -5,7 +5,7 @@ export default interface GameQuery {
   genreId?: number;
   platformId?: number;
   sortOrder: string;
-  search: string;
+  search?: string;
   page: number;
   pageSize: number;
 }
