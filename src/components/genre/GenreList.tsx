@@ -1,16 +1,10 @@
-import { Box, Heading, VStack, Text } from "@chakra-ui/react";
-import Genre from "../../models/genre";
-import GenreItem from "./GenreItem";
-import GenreItemSkeleton from "./GenreItemSkeleton";
-import GenreItemContainer from "./GenreItemContainer";
+import { Box, Text, VStack } from "@chakra-ui/react";
 import useGeneres from "../../hooks/useGenres";
+import GenreItem from "./GenreItem";
+import GenreItemContainer from "./GenreItemContainer";
+import GenreItemSkeleton from "./GenreItemSkeleton";
 
-interface Props {
-  selectedGenreId?: number;
-  onSelectGenre: (genre: Genre) => void;
-}
-
-const GenreList = ({ selectedGenreId, onSelectGenre }: Props) => {
+const GenreList = () => {
   const { data, error, isLoading } = useGeneres();
 
   const skeletons = [...Array(10).keys()];
@@ -28,11 +22,7 @@ const GenreList = ({ selectedGenreId, onSelectGenre }: Props) => {
             ))
           : data?.map((genre) => (
               <GenreItemContainer key={genre.id}>
-                <GenreItem
-                  genre={genre}
-                  selectedGenreId={selectedGenreId}
-                  onSelect={onSelectGenre}
-                />
+                <GenreItem genre={genre} />
               </GenreItemContainer>
             ))}
       </VStack>
