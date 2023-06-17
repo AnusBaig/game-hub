@@ -1,30 +1,25 @@
 import { Box, Flex, Grid, GridItem, Hide, Show } from "@chakra-ui/react";
-import "./App.css";
-import GameGrid from "./components/game/GameGrid";
-import GameHeading from "./components/game/GameHeading";
-import PlatformSelector from "./components/game/PlatformSelector";
-import SortSelector from "./components/game/SortSelector";
-import GenreHeading from "./components/genre/GenreHeading";
-import GenreList from "./components/genre/GenreList";
-import Navbar from "./components/navbar/Navbar";
+import GameGrid from "../components/game/GameGrid";
+import GameHeading from "../components/game/GameHeading";
+import PlatformSelector from "../components/game/PlatformSelector";
+import SortSelector from "../components/game/SortSelector";
+import GenreHeading from "../components/genre/GenreHeading";
+import GenreList from "../components/genre/GenreList";
 
-function App() {
+function HomePage() {
   return (
     <Grid
       templateAreas={{
-        base: `"nav" "main"`,
-        sm: `"nav" "main"`,
-        md: `"nav nav" "slider main"`,
-        lg: `"nav nav" "aside main"`,
+        base: `"main"`,
+        sm: `"main"`,
+        md: `"slider main"`,
+        lg: `"aside main"`,
       }}
       templateColumns={{
         base: "1fr",
         md: "250px 1fr",
       }}
     >
-      <GridItem area='nav'>
-        <Navbar />
-      </GridItem>
       <Show breakpoint='(min-width: 768px) and (max-width: 992px)'>
         <GridItem area='slider' bg='pink'>
           Slider
@@ -52,4 +47,4 @@ function App() {
   );
 }
 
-export default App;
+export default HomePage;
