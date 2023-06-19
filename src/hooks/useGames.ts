@@ -4,7 +4,7 @@ import { Endpoints } from "../constants/endpoints";
 import Game from "../models/game";
 import HookResponse from "../models/responses/hookResponse";
 import useGameQueryStore from "../store";
-import useInfiniteData from "./useInfiniteData";
+import useInfiniteData from "./base/useInfiniteData";
 
 const useGames = (): HookResponse<Game[]> => {
   const gameQuery = useGameQueryStore((s) => s.gameQuery);

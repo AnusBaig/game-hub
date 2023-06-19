@@ -17,7 +17,8 @@ export default class ApiClient<T> {
   getAll = (params?: object) =>
     axiosInstance.get<T>(this.endpoint, { params }).then((res) => res.data);
 
-  get = () => axiosInstance.get<T>(this.endpoint).then((res) => res.data);
+  get = (params?: object) =>
+    axiosInstance.get<T>(this.endpoint, { params }).then((res) => res.data);
 
   post = (payload: T) =>
     axiosInstance.post<T>(this.endpoint, payload).then((res) => res.data);

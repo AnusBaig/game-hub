@@ -4,10 +4,10 @@ import { Endpoints } from "../constants/endpoints";
 import platforms from "../data/platforms";
 import Platform from "../models/platform";
 import HookResponse from "../models/responses/hookResponse";
-import useData from "./useData";
+import useListData from "./base/useListData";
 
 const usePlatforms = (): HookResponse<Platform[]> => {
-  return useData<Platform>(
+  return useListData<Platform>(
     Endpoints.FETCH_PARENT_PLATFORMS,
     CacheKeys.PLATFORMS_KEY,
     undefined,

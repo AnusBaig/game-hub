@@ -1,12 +1,12 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import _ from "lodash";
 import ms from "ms";
-import { CacheKeys } from "../constants/cacheKeys";
-import { Endpoints } from "../constants/endpoints";
-import queryConfig from "../models/config/queryConfig";
-import FetchResponse from "../models/responses/fetchResponse";
-import HookResponse from "../models/responses/hookResponse";
-import ApiClient from "../services/apiClient";
+import { CacheKeys } from "../../constants/cacheKeys";
+import { Endpoints } from "../../constants/endpoints";
+import queryConfig from "../../models/config/queryConfig";
+import FetchResponse from "../../models/responses/fetchResponse";
+import HookResponse from "../../models/responses/hookResponse";
+import ApiClient from "../../services/apiClient";
 
 const useInfiniteData = <T>(
   endpoint: Endpoints,
@@ -15,7 +15,7 @@ const useInfiniteData = <T>(
   queryConfig?: queryConfig,
   deps?: any[]
 ): HookResponse<T[]> => {
-  var client = new ApiClient<FetchResponse<T>>(endpoint);
+  var client = new ApiClient<FetchResponse<T[]>>(endpoint);
 
   const {
     data,
@@ -24,7 +24,7 @@ const useInfiniteData = <T>(
     isLoading,
     isFetchingNextPage,
     hasNextPage,
-  } = useInfiniteQuery<FetchResponse<T>, Error>({
+  } = useInfiniteQuery<FetchResponse<T[]>, Error>({
     queryKey: [key, ...(deps || [])],
     queryFn: ({ pageParam = 1 }) =>
       client.getAll({ ...requestparams, page: pageParam }),
