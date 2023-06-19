@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import useGameDetail from "../../hooks/useGameDetail";
 import ExpandableText from "../utils/ExpandableText";
 import Loader from "../utils/Loader";
+import AttributeGrid from "./AttributeGrid";
 
 const GameDetail = () => {
   const { id } = useParams();
@@ -19,6 +20,12 @@ const GameDetail = () => {
         {game.name_original}
       </Heading>
       <ExpandableText text={game.description_raw} />
+      <AttributeGrid
+        platforms={game.parent_platforms}
+        publishers={game.publishers}
+        genres={game.genres}
+        metascore={game.metacritic}
+      />
     </Box>
   );
 };
