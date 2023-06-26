@@ -13,7 +13,8 @@ const useGameDetail = (id: string): HookResponse<GameDetail> => {
     undefined,
     {
       staleTime: ms("4h"),
-    }
+    },
+    [id]
   );
 };
 

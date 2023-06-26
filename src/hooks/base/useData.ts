@@ -32,7 +32,7 @@ const useData = <T>(
     queryFn: () => client.get(requestparams),
     staleTime: ms("2m"),
     retry: 4,
-    keepPreviousData: true,
+    keepPreviousData: false,
     ...queryConfig,
   });
 
