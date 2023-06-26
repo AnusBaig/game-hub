@@ -16,7 +16,7 @@ const GameAttribute = ({ heading, dataList, showBadge }: Props) => {
       {dataList &&
         dataList.map((text, index) =>
           showBadge ? (
-            <CriticScore score={Number(text)} />
+            <CriticScore key={index} score={Number(text)} />
           ) : (
             <Text key={index} marginBottom={2}>
               {text}
