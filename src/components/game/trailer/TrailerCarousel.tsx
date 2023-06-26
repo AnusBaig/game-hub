@@ -1,8 +1,8 @@
-import { Box, Button, HStack, Image, Tooltip, Icon } from "@chakra-ui/react";
+import { Box, HStack, Icon, Image, Tooltip } from "@chakra-ui/react";
 import _ from "lodash";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import useGameTrailers from "../../../hooks/useGameTrailers";
 import useGameTrailerStore from "./gameTrailerStore";
-import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
 interface Props {
   gameId: number;
@@ -10,11 +10,12 @@ interface Props {
 
 const TrailerCarousel = ({ gameId }: Props) => {
   const { data: trailers } = useGameTrailers(gameId);
-  const { trailerId, setTrailerId } = useGameTrailerStore();
+  let { trailerId, setTrailerId } = useGameTrailerStore();
 
   if (!trailers) return null;
 
   const trailerCycles = _.chunk(trailers.results, 8);
+  if (!trailerId) trailerId = trailers.results.at(0)?.id;
 
   return (
     <Box
