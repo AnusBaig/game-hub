@@ -14,10 +14,11 @@ const useGameScreenshots = (
     CacheKeys.GAME_SCREENSHOTS_KEY,
     {
       id: query.gameId,
-      page: query.page || 1,
-      page_size: query.pageSize || 10,
     },
-    undefined,
+    {
+      page: query.page,
+      page_size: query.pageSize,
+    },
     { staleTime: ms("3h") },
     [query]
   );

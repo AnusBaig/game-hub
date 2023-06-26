@@ -6,7 +6,11 @@ interface Props {
   gameId: number;
 }
 const GameScreenshots = ({ gameId }: Props) => {
-  const { data, isLoading, error } = useGameScreenshots({ gameId });
+  const { data, isLoading, error } = useGameScreenshots({
+    gameId,
+    page: 1,
+    pageSize: 8,
+  });
 
   if (isLoading || !data?.length) return null;
 
@@ -28,8 +32,6 @@ const GameScreenshots = ({ gameId }: Props) => {
             key={screenshot.id}
             src={screenshot.image}
             alt={screenshot.image}
-            // maxWidth={screenshot.width}
-            // maxHeight={screenshot.height}
             objectFit='cover'
           />
         ))}
