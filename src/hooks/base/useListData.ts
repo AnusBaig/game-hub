@@ -39,7 +39,7 @@ const useListData = <T>(
 
   return {
     data: data?.results,
-    error: !data?.count ? null : error?.message || "No data available",
+    error: data?.count ? null : error?.message || "No data available",
     isLoading,
   };
 };
