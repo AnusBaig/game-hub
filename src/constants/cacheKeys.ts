@@ -5,4 +5,5 @@ export enum CacheKeys {
   SELECTED_GENRE_KEY = "selectedGenre",
   GAME_DETAIL_KEY = "gameDetail",
   GAME_TRAILERS_KEY = "gameTrailers",
+  GAME_SCREENSHOTS_KEY = "gameScreenshots",
 }

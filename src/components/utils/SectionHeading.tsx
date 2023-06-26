@@ -4,13 +4,13 @@ interface Props {
   headingText?: string;
 }
 
-const TrailerHeading = ({ headingText }: Props) => {
+const SectionHeading = ({ headingText }: Props) => {
   if (!headingText) return null;
   return (
-    <Heading as='h4' fontSize='2xl' my={3}>
+    <Heading as='h2' fontSize='4xl' mb={5}>
       {headingText}
     </Heading>
   );
 };
 
-export default TrailerHeading;
+export default SectionHeading;

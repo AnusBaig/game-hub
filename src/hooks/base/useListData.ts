@@ -10,7 +10,7 @@ import ApiClient from "../../services/apiClient";
 const useListData = <T>(
   endpoint: Endpoints,
   key: CacheKeys,
-  routeParams?: { [key: string]: string },
+  routeParams?: { [key: string]: string | number },
   requestparams?: object,
   queryConfig?: queryConfig,
   deps?: any[]
@@ -22,7 +22,7 @@ const useListData = <T>(
       const placeholder = `:${key}`;
       const value = routeParams[key];
 
-      url = url.replace(placeholder, value);
+      url = url.replace(placeholder, value.toString());
     }
   }
 

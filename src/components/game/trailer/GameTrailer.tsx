@@ -1,5 +1,6 @@
-import { AspectRatio } from "@chakra-ui/react";
+import { AspectRatio, Hide } from "@chakra-ui/react";
 import useGameTrailer from "../../../hooks/useGameTrailer";
+import SectionHeading from "../../utils/SectionHeading";
 import TrailerCarousel from "./TrailerCarousel";
 import TrailerHeading from "./TrailerHeading";
 
@@ -14,11 +15,19 @@ const GameTrailer = ({ gameId }: Props) => {
 
   return (
     <>
-      <TrailerHeading headingText={trailer.name} />
+      <Hide above='lg'>
+        <SectionHeading headingText='Game Trailer' />
+      </Hide>
+
       <AspectRatio maxHeight={700}>
         <video poster={trailer.preview} src={trailer.data[480]} controls />
       </AspectRatio>
-      <TrailerCarousel gameId={gameId} />
+      <Hide below='md'>
+        <TrailerHeading headingText={trailer.name} />
+      </Hide>
+      <Hide below='md'>
+        <TrailerCarousel gameId={gameId} />
+      </Hide>
     </>
   );
 };
