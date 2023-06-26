@@ -14,7 +14,7 @@ const useGameTrailers = (
     CacheKeys.GAME_TRAILERS_KEY,
     { id: id.toString() },
     undefined,
-    { staleTime: ms("6h") },
+    { staleTime: ms("3h") },
     [id]
   );
 };
