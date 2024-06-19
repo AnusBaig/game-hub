@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-hub-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: game-hub
+  template:
+    metadata:
+      labels:
+        app: game-hub
+    spec:
+      containers:
+        - name: game-hub
+          image: talhabaig/game-hub:0.0.4
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          ports:
+            - containerPort: 3500
+          env:
+            - name: API_BASEURL
+              value: "https://api.rawg.io/api/"
+            - name: API_KEY
+              value: "dc5df7919f524e57938609551e246696"
