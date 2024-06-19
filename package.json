@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "start": "node server.js",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
@@ -16,6 +17,7 @@
     "@tanstack/react-query-devtools": "^4.29.12",
     "axios": "^1.4.0",
     "bootstrap": "^5.3.0",
+    "express": "^4.19.2",
     "framer-motion": "^10.12.16",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
