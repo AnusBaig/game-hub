@@ -12,8 +12,18 @@ pipeline {
   stages {
 
     stage('Checkout Source') {
+      environment {
+               registryCredential = 'github-talha'
+           }
       steps {
-        git 'https://github.com/AnusBaig/game-hub.git'
+        script {
+                    checkout([$class: 'GitSCM', 
+                        branches: [[name: '*/dockerize']], 
+                        doGenerateSubmoduleConfigurations: false, 
+                        extensions: [], 
+                        userRemoteConfigs: [[url: 'https://github.com/AnusBaig/game-hub.git', 
+                                            credentialsId: registryCredential]]])
+                }
       }
     }
 
