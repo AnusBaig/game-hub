@@ -61,10 +61,8 @@ pipeline {
         script {
           try {
             echo "Deploying to Kubernetes..."
-            kubernetesDeploy(
-              configs: 'deployment.yaml,service.yaml', 
-              kubeConfig: [path: '/path/to/kubeconfig']
-            )
+            sh 'kubectl apply -f deployment.yaml'
+            sh 'kubectl apply -f service.yaml'
             echo "Deployment to Kubernetes successful."
           } catch (Exception e) {
             currentBuild.result = 'FAILURE'
