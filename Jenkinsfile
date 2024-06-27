@@ -59,9 +59,17 @@ pipeline {
     stage('Deploy to Kubernetes') {
       steps {
         script {
-          echo "Deploying to Kubernetes..."
-          kubernetesDeploy(configs: "deployment.yaml", "service.yaml")
-          echo "Deployment to Kubernetes successful."
+          try {
+            echo "Deploying to Kubernetes..."
+            kubernetesDeploy(
+              configs: 'deployment.yaml,service.yaml', 
+              kubeConfig: [path: '/path/to/kubeconfig']
+            )
+            echo "Deployment to Kubernetes successful."
+          } catch (Exception e) {
+            currentBuild.result = 'FAILURE'
+            error "Failed to deploy to Kubernetes: ${e.message}"
+          }
         }
       }
     }
