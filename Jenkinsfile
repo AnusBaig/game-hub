@@ -43,7 +43,7 @@ pipeline {
       }
     }
 
-    stage('Push Image to Docker Hub') {
+    stage('Push Image') {
       steps {
         script {
           echo "Pushing Docker image to ${dockerRegistryUrl}..."
