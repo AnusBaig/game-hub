@@ -1,7 +1,7 @@
 pipeline {
 
   environment {
-    dockerimagename = "talhabaig/game-hub"
+    dockerImageName = "talhabaig/game-hub"
     dockerImage = ""
   }
 
@@ -30,7 +30,7 @@ pipeline {
     stage('Build image') {
       steps{
         script {
-          dockerImage = docker.build dockerimagename
+          dockerImage = docker.build(env.dockerImageName)
         }
       }
     }
@@ -48,7 +48,7 @@ pipeline {
       }
     }
 
-    stage('Deploying React.js container to Kubernetes') {
+    stage('Deploying game-hub container to Kubernetes') {
       steps {
         script {
           kubernetesDeploy(configs: "deployment.yaml", "service.yaml")
