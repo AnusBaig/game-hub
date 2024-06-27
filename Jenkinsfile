@@ -31,8 +31,8 @@ pipeline {
       steps{
         script {
           try {
-                        echo "Building Docker image: ${env.dockerimagename}"
-                        dockerImage = docker.build(env.dockerimagename)
+                        echo "Building Docker image: ${env.dockerImageName}"
+                        dockerImage = docker.build(env.dockerImageName)
                         echo "Docker image built successfully: ${dockerImage.id}"
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
