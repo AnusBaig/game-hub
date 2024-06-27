@@ -69,8 +69,10 @@ pipeline {
 
   post {
     always {
-      echo "Cleaning up Docker images..."
-      dockerImage.remove() // Clean up Docker image after pipeline execution
+      script {
+        echo "Cleaning up Docker images..."
+        dockerImage.remove() // Clean up Docker image after pipeline execution
+      }
     }
     success {
       echo "Pipeline executed successfully."
