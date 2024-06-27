@@ -17,7 +17,7 @@ pipeline {
            }
       steps {
         script {
-                    checkout([$class: 'GitSCM', 
+                        checkout([$class: 'GitSCM', 
                         branches: [[name: '*/dockerize']], 
                         doGenerateSubmoduleConfigurations: false, 
                         extensions: [], 
@@ -30,7 +30,14 @@ pipeline {
     stage('Build image') {
       steps{
         script {
-          dockerImage = docker.build(env.dockerImageName)
+          try {
+                        echo "Building Docker image: ${env.dockerimagename}"
+                        dockerImage = docker.build(env.dockerimagename)
+                        echo "Docker image built successfully: ${dockerImage.id}"
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        error "Failed to build Docker image: ${e.message}"
+                    }
         }
       }
     }
