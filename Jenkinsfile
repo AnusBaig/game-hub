@@ -27,7 +27,7 @@ pipeline {
                                          credentialsId: gitHubCredential]]])
           echo "Source code checked out successfully."
           echo "Installing dependencies and building the project..."
-          sh 'npm install && npm run build'
+          bat 'npm install && npm run build'
           echo "Dependencies installed and project built successfully."
         }
       }
@@ -71,8 +71,8 @@ pipeline {
         script {
           try {
             echo "Deploying to Kubernetes..."
-            sh 'kubectl apply -f deployment.yaml'
-            sh 'kubectl apply -f service.yaml'
+            bat 'kubectl apply -f deployment.yaml'
+            bat 'kubectl apply -f service.yaml'
             echo "Deployment to Kubernetes successful."
           } catch (Exception e) {
             currentBuild.result = 'FAILURE'
