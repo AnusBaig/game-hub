@@ -54,9 +54,10 @@ pipeline {
           try {
               echo "Pushing Docker image to ${dockerRegistryUrl}..."
               docker.withRegistry(dockerRegistryUrl, dockerHubCredential) {
-              dockerImage.tag("latest")
-              dockerImage.push()
-              echo "Docker image pushed successfully to Docker Hub."
+                dockerImage.tag("latest")
+                dockerImage.push()
+                echo "Docker image pushed successfully to Docker Hub."
+              } 
             } catch (Exception e) {
               currentBuild.result = 'FAILURE'
               error "Failed to push Image to Docker Hub: ${e.message}"
