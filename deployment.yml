@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: game-hub
-          image: talhabaig/game-hub:0.0.4
+          image: talhabaig/game-hub:latest
           resources:
             limits:
               memory: 512Mi
