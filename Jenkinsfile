@@ -9,7 +9,7 @@ pipeline {
     dockerImageName = "talhabaig/game-hub"
     dockerImage = ""
 
-    kubeconfigPath = "${env.HOME}/.kube/config".replace('\\', '/')
+    kubeConfigPath = "${env.USERPROFILE}\.kube\config"
   }
 
   agent {
@@ -73,8 +73,8 @@ pipeline {
         script {
           try {
             echo "Deploying to Kubernetes..."
-            bat "kubectl --kubeconfig=${kubeconfigPath} apply -f deployment.yml"
-            bat "kubectl --kubeconfig=${kubeconfigPath} apply -f service.yml"
+            bat "kubectl --kubeconfig=${kubeConfigPath} apply -f deployment.yml"
+            bat "kubectl --kubeconfig=${kubeConfigPath} apply -f service.yml"
             echo "Deployment to Kubernetes successful."
           } catch (Exception e) {
             currentBuild.result = 'FAILURE'
