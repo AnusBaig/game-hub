@@ -66,13 +66,13 @@ pipeline {
       }
     }
 
-    stage('Deploy to Kubernetes') {
+    stage('Deploy to K8s') {
       steps {
         script {
           try {
             echo "Deploying to Kubernetes..."
-            bat 'kubectl apply -f deployment.yaml'
-            bat 'kubectl apply -f service.yaml'
+            bat 'kubectl apply -f deployment.yml'
+            bat 'kubectl apply -f service.yml'
             echo "Deployment to Kubernetes successful."
           } catch (Exception e) {
             currentBuild.result = 'FAILURE'
