@@ -15,7 +15,7 @@ pipeline {
   }
 
   stages {
-    stage('Checkout Source') {
+    stage('Build Project') {
       steps {
         script {
           echo "Checking out source code from ${gitRepoUrl}..."
@@ -24,6 +24,9 @@ pipeline {
                     userRemoteConfigs: [[url: gitRepoUrl, 
                                          credentialsId: githubCredential]]])
           echo "Source code checked out successfully."
+          echo "Installing dependencies and building the project..."
+          bat 'npm install && npm run build'
+          echo "Dependencies installed and project built successfully."
         }
       }
     }
@@ -46,11 +49,16 @@ pipeline {
     stage('Push Image') {
       steps {
         script {
-          echo "Pushing Docker image to ${dockerRegistryUrl}..."
-          docker.withRegistry(dockerRegistryUrl, dockerHubCredential) {
-            dockerImage.tag("latest")
-            dockerImage.push()
-            echo "Docker image pushed successfully to Docker Hub."
+          try {
+              echo "Pushing Docker image to ${dockerRegistryUrl}..."
+              docker.withRegistry(dockerRegistryUrl, dockerHubCredential) {
+              dockerImage.tag("latest")
+              dockerImage.push()
+              echo "Docker image pushed successfully to Docker Hub."
+            } catch (Exception e) {
+              currentBuild.result = 'FAILURE'
+              error "Failed to push Image to Docker Hub: ${e.message}"
+            }
           }
         }
       }
@@ -61,8 +69,12 @@ pipeline {
         script {
           try {
             echo "Deploying to Kubernetes..."
-            sh 'kubectl apply -f deployment.yaml'
-            sh 'kubectl apply -f service.yaml'
+            // kubernetesDeploy(
+            //   configs: 'deployment.yaml,service.yaml', 
+            //   kubeConfig: [path: '/path/to/kubeconfig']
+            // )
+            bat 'kubectl apply -f deployment.yaml'
+            bat 'kubectl apply -f service.yaml'
             echo "Deployment to Kubernetes successful."
           } catch (Exception e) {
             currentBuild.result = 'FAILURE'
@@ -77,7 +89,7 @@ pipeline {
     always {
       script {
         echo "Cleaning up Docker images..."
-        dockerImage.remove() // Clean up Docker image after pipeline execution
+        dockerImage.remove()
       }
     }
     success {
