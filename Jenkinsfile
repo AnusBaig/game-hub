@@ -9,7 +9,7 @@ pipeline {
     dockerImageName = "talhabaig/game-hub"
     dockerImage = ""
 
-    kubeConfigPath = "${env.USERPROFILE}\.kube\config"
+    kubeConfigPath = "${env.USERPROFILE}\\.kube\\config"
   }
 
   agent {
