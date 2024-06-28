@@ -86,8 +86,17 @@ pipeline {
   post {
     always {
       script {
-        echo "Cleaning up Docker images..."
-        dockerImage.remove()
+        try {
+          echo "Cleaning up Docker images..."
+          docker.withRegistry(dockerRegistryUrl, dockerhubCredential) {
+            docker.image(dockerImageName).inside {
+              bat 'docker rmi ${dockerImage.id}'
+            }
+          }
+          echo "Docker images cleaned up successfully."
+        } catch (Exception e) {
+          echo "Failed to clean up Docker images: ${e.message}"
+        }
       }
     }
     success {
