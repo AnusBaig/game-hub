@@ -73,8 +73,8 @@ pipeline {
         script {
           try {
             echo "Deploying to Kubernetes..."
-            bat "kubectl --kubeconfig=${kubeConfigPath} apply -f deployment.yml"
-            bat "kubectl --kubeconfig=${kubeConfigPath} apply -f service.yml"
+            bat "kubectl apply --kubeconfig=${kubeConfigPath} -f deployment.yml"
+            bat "kubectl apply --kubeconfig=${kubeConfigPath} -f service.yml"
             echo "Deployment to Kubernetes successful."
           } catch (Exception e) {
             currentBuild.result = 'FAILURE'
