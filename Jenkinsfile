@@ -1,8 +1,10 @@
 pipeline {
   environment {
     gitRepoUrl = 'https://github.com/AnusBaig/game-hub.git'
+    gitBranchName = '*/dockerize'
+    gitHubCredential = 'github-talha'
+
     dockerRegistryUrl = 'https://registry.hub.docker.com'
-    githubCredential = 'github-talha'
     dockerHubCredential = 'dockerhub-talha'
     dockerImageName = "talhabaig/game-hub"
     dockerImage = ""
@@ -20,12 +22,12 @@ pipeline {
         script {
           echo "Checking out source code from ${gitRepoUrl}..."
           checkout([$class: 'GitSCM', 
-                    branches: [[name: '*/dockerize']], 
+                    branches: [[name: gitBranchName]], 
                     userRemoteConfigs: [[url: gitRepoUrl, 
-                                         credentialsId: githubCredential]]])
+                                         credentialsId: gitHubCredential]]])
           echo "Source code checked out successfully."
           echo "Installing dependencies and building the project..."
-          bat 'npm install && npm run build'
+          sh 'npm install && npm run build'
           echo "Dependencies installed and project built successfully."
         }
       }
@@ -73,8 +75,8 @@ pipeline {
             //   configs: 'deployment.yaml,service.yaml', 
             //   kubeConfig: [path: '/path/to/kubeconfig']
             // )
-            bat 'kubectl apply -f deployment.yaml'
-            bat 'kubectl apply -f service.yaml'
+            sh 'kubectl apply -f deployment.yaml'
+            sh 'kubectl apply -f service.yaml'
             echo "Deployment to Kubernetes successful."
           } catch (Exception e) {
             currentBuild.result = 'FAILURE'
