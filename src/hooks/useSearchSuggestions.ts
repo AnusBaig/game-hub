@@ -41,7 +41,7 @@ const useSearchSuggestions = (searchTerm: string) => {
       released: game.released,
       background_image: game.background_image
     }));
-  }, [gamesData, shouldFetch]);
+  }, [gamesData, shouldFetch, searchTerm]);
 
   return {
     data: suggestions,
