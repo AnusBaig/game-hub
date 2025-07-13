@@ -33,6 +33,15 @@ import {
 import { useState, useEffect } from "react";
 import { BsFilter, BsX } from "react-icons/bs";
 import useGameQueryStore from "../../store";
+import {
+  GAME_TAGS,
+  ESRB_RATINGS,
+  GAME_PUBLISHERS,
+  GAME_DEVELOPERS,
+  getTagName,
+  getPublisherName,
+  getDeveloperName
+} from "../../constants/gameFilters";
 
 interface FilterState {
   metacriticRange: [number, number];
@@ -68,80 +77,10 @@ const AdvancedFilters = () => {
   const [newPublisher, setNewPublisher] = useState("");
   const [newDeveloper, setNewDeveloper] = useState("");
 
-  // Common tags for games with correct RAWG API slugs
-  const commonTags = [
-    { name: "Singleplayer", slug: "31" },
-    { name: "Multiplayer", slug: "7" },
-    { name: "Co-op", slug: "18" },
-    { name: "RPG", slug: "24" },
-    { name: "Atmospheric", slug: "13" },
-    { name: "Great Soundtrack", slug: "42" },
-    { name: "Action", slug: "14" },
-    { name: "Adventure", slug: "30" },
-    { name: "Strategy", slug: "10" },
-    { name: "Shooter", slug: "36" },
-    { name: "Platformer", slug: "83" },
-    { name: "Puzzle", slug: "30" },
-    { name: "Racing", slug: "8" },
-    { name: "Sports", slug: "15" },
-    { name: "Simulation", slug: "14" },
-    { name: "Horror", slug: "4" },
-    { name: "Survival", slug: "2" },
-    { name: "Open World", slug: "37" },
-    { name: "Indie", slug: "3" }
-  ];
 
-  const esrbRatings = [
-    { value: "", label: "Any Rating" },
-    { value: "everyone", label: "Everyone" },
-    { value: "everyone-10-plus", label: "Everyone 10+" },
-    { value: "teen", label: "Teen" },
-    { value: "mature", label: "Mature 17+" },
-    { value: "adults-only", label: "Adults Only 18+" },
-  ];
 
-  // Common publishers with correct slugs
-  const commonPublishers = [
-    { name: "Valve", slug: "valve" },
-    { name: "Electronic Arts", slug: "electronic-arts" },
-    { name: "Square Enix", slug: "square-enix" },
-    { name: "Ubisoft", slug: "ubisoft-entertainment" },
-    { name: "Microsoft Studios", slug: "microsoft-studios" },
-    { name: "SEGA", slug: "sega-2" },
-    { name: "Activision", slug: "activision" },
-    { name: "Sony Interactive Entertainment", slug: "sony-interactive-entertainment" },
-    { name: "Nintendo", slug: "nintendo" }
-  ];
 
-  // Common developers with correct slugs
-  const commonDevelopers = [
-    { name: "Valve Software", slug: "valve-software" },
-    { name: "Ubisoft Montreal", slug: "ubisoft-montreal" },
-    { name: "Square Enix", slug: "square-enix" },
-    { name: "Capcom", slug: "capcom" },
-    { name: "Bethesda Game Studios", slug: "bethesda-game-studios" },
-    { name: "CD Projekt RED", slug: "cd-projekt-red" },
-    { name: "Rockstar North", slug: "rockstar-north" },
-    { name: "Naughty Dog", slug: "naughty-dog" }
-  ];
 
-  // Helper function to get tag name from slug/ID
-  const getTagName = (tagId: string) => {
-    const tag = commonTags.find(t => t.slug === tagId);
-    return tag ? tag.name : tagId;
-  };
-
-  // Helper function to get publisher name from slug
-  const getPublisherName = (publisherSlug: string) => {
-    const publisher = commonPublishers.find(p => p.slug === publisherSlug);
-    return publisher ? publisher.name : publisherSlug;
-  };
-
-  // Helper function to get developer name from slug
-  const getDeveloperName = (developerSlug: string) => {
-    const developer = commonDevelopers.find(d => d.slug === developerSlug);
-    return developer ? developer.name : developerSlug;
-  };
 
   useEffect(() => {
     // Initialize from store
@@ -400,7 +339,7 @@ const AdvancedFilters = () => {
                     esrbRating: e.target.value
                   }))}
                 >
-                  {esrbRatings.map(rating => (
+                  {ESRB_RATINGS.map(rating => (
                     <option key={rating.value} value={rating.value}>
                       {rating.label}
                     </option>
@@ -414,7 +353,7 @@ const AdvancedFilters = () => {
               <FormControl>
                 <FormLabel>Tags</FormLabel>
                 <Wrap mb={2}>
-                  {commonTags.map(tag => (
+                  {GAME_TAGS.map(tag => (
                     <WrapItem key={tag.slug}>
                       <Button
                         size="sm"
@@ -460,7 +399,7 @@ const AdvancedFilters = () => {
               <FormControl>
                 <FormLabel>Publishers</FormLabel>
                 <Wrap mb={2}>
-                  {commonPublishers.map(publisher => (
+                  {GAME_PUBLISHERS.map(publisher => (
                     <WrapItem key={publisher.slug}>
                       <Button
                         size="sm"
@@ -506,7 +445,7 @@ const AdvancedFilters = () => {
               <FormControl>
                 <FormLabel>Developers</FormLabel>
                 <Wrap mb={2}>
-                  {commonDevelopers.map(developer => (
+                  {GAME_DEVELOPERS.map(developer => (
                     <WrapItem key={developer.slug}>
                       <Button
                         size="sm"

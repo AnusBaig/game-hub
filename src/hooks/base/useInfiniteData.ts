@@ -32,7 +32,7 @@ const useInfiniteData = <T>(
       lastPage.next ? allPages.length + 1 : undefined,
     staleTime: ms("10m"),
     retry: 4,
-    keepPreviousData: true,
+    keepPreviousData: false, // Disable to allow fresh data for search
     ...queryConfig,
   });
 

@@ -14,7 +14,13 @@ const GameDetail = () => {
 
   if (isLoading) return <Loader />;
 
-  if (error || !game) return <Text>Unable to fetch Game deatils</Text>;
+  if (error) {
+    return <Text>Sorry, we couldn't load the game details. Please try again.</Text>;
+  }
+
+  if (!game) {
+    return <Text>Game not found. Please check the game ID and try again.</Text>;
+  }
 
   return (
     <SimpleGrid margin={5} columns={{ base: 1, lg: 2 }} spacing={5}>

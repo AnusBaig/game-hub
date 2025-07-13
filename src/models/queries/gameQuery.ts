@@ -18,4 +18,6 @@ export default interface GameQuery {
   developers?: string[];
   esrbRating?: string;
   platforms?: number[];
+  // Cache invalidation helper
+  searchTimestamp?: number;
 }

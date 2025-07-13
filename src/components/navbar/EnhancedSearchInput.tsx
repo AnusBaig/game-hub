@@ -18,6 +18,7 @@ import { useState, useEffect, useRef } from "react";
 import { BsSearch, BsClock, BsX } from "react-icons/bs";
 import useGameQueryStore from "../../store";
 import useSearchSuggestions from "../../hooks/useSearchSuggestions";
+import { getStringArray, setStringArray } from "../../utils/localStorage";
 
 interface SearchSuggestion {
   id: number;
@@ -46,11 +47,9 @@ const EnhancedSearchInput = () => {
   const hoverBg = useColorModeValue("gray.50", "gray.700");
 
   useEffect(() => {
-    // Load recent searches from localStorage
-    const stored = localStorage.getItem("gameHubRecentSearches");
-    if (stored) {
-      setRecentSearches(JSON.parse(stored));
-    }
+    // Load recent searches from localStorage with error handling
+    const stored = getStringArray("gameHubRecentSearches", []);
+    setRecentSearches(stored);
   }, []);
 
   useEffect(() => {
@@ -72,13 +71,25 @@ const EnhancedSearchInput = () => {
   const addToRecentSearches = (term: string) => {
     const updated = [term, ...recentSearches.filter(s => s !== term)].slice(0, 5);
     setRecentSearches(updated);
-    localStorage.setItem("gameHubRecentSearches", JSON.stringify(updated));
+    
+    // Attempt to save to localStorage with error handling
+    const saved = setStringArray("gameHubRecentSearches", updated);
+    if (!saved) {
+      console.warn('Failed to save recent search to localStorage');
+      // Component continues to work without localStorage
+    }
   };
 
   const removeFromRecentSearches = (term: string) => {
     const updated = recentSearches.filter(s => s !== term);
     setRecentSearches(updated);
-    localStorage.setItem("gameHubRecentSearches", JSON.stringify(updated));
+    
+    // Attempt to save to localStorage with error handling
+    const saved = setStringArray("gameHubRecentSearches", updated);
+    if (!saved) {
+      console.warn('Failed to update recent searches in localStorage');
+      // Component continues to work without localStorage
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

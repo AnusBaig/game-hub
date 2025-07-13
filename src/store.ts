@@ -16,6 +16,17 @@ interface GameQueryStore {
   setEsrbRating: (rating?: string) => void;
   setPlatforms: (platforms: number[]) => void;
   clearFilters: () => void;
+  // Individual clear methods
+  clearGenre: () => void;
+  clearPlatform: () => void;
+  clearSearch: () => void;
+  clearSort: () => void;
+  clearMetacriticRange: () => void;
+  clearReleaseDateRange: () => void;
+  clearTags: () => void;
+  clearPublishers: () => void;
+  clearDevelopers: () => void;
+  clearEsrbRating: () => void;
 }
 
 const useGameQueryStore = create<GameQueryStore>((set) => ({
@@ -42,15 +53,18 @@ const useGameQueryStore = create<GameQueryStore>((set) => ({
     })),
   setSortOrder: (sortOrder) =>
     set((store) => ({
-      gameQuery: { ...store.gameQuery, sortOrder },
+      gameQuery: { ...store.gameQuery, sortOrder, page: 1 },
     })),
   setSearch: (search) =>
-    set(() => ({
+    set((store) => ({
       gameQuery: {
-        sortOrder: "", // sort by relevance
-        page: 1,
-        pageSize: 12,
+        sortOrder: "", // Reset to relevance for search results
+        pageSize: store.gameQuery.pageSize, // Preserve page size preference
         search,
+        page: 1,
+        // Add timestamp to force cache invalidation when search resets filters
+        searchTimestamp: Date.now(),
+        // All other filters are reset to ensure search results are not restricted
       },
     })),
   setMetacriticRange: (min, max) =>
@@ -108,6 +122,7 @@ const useGameQueryStore = create<GameQueryStore>((set) => ({
       gameQuery: {
         ...store.gameQuery,
         platforms,
+        page: 1,
       },
     })),
   clearFilters: () =>
@@ -116,6 +131,89 @@ const useGameQueryStore = create<GameQueryStore>((set) => ({
         sortOrder: "",
         page: 1,
         pageSize: 12,
+      },
+    })),
+  // Individual clear methods
+  clearGenre: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        genreId: undefined,
+        page: 1,
+      },
+    })),
+  clearPlatform: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        platformId: undefined,
+        page: 1,
+      },
+    })),
+  clearSearch: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        search: undefined,
+        page: 1,
+      },
+    })),
+  clearSort: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        sortOrder: "",
+        page: 1,
+      },
+    })),
+  clearMetacriticRange: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        metacriticMin: undefined,
+        metacriticMax: undefined,
+        page: 1,
+      },
+    })),
+  clearReleaseDateRange: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        releasedAfter: undefined,
+        releasedBefore: undefined,
+        page: 1,
+      },
+    })),
+  clearTags: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        tags: undefined,
+        page: 1,
+      },
+    })),
+  clearPublishers: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        publishers: undefined,
+        page: 1,
+      },
+    })),
+  clearDevelopers: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        developers: undefined,
+        page: 1,
+      },
+    })),
+  clearEsrbRating: () =>
+    set((store) => ({
+      gameQuery: {
+        ...store.gameQuery,
+        esrbRating: undefined,
+        page: 1,
       },
     })),
 }));
