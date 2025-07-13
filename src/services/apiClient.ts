@@ -1,9 +1,19 @@
 import axios from "axios";
 
+const getApiKey = (): string => {
+  const apiKey = import.meta.env.VITE_RAWG_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "RAWG API key is not configured. Please add VITE_RAWG_API_KEY to your .env.local file."
+    );
+  }
+  return apiKey;
+};
+
 const axiosInstance = axios.create({
   baseURL: "https://api.rawg.io/api/",
   params: {
-    key: "dc5df7919f524e57938609551e246696",
+    key: getApiKey(),
   },
 });
 

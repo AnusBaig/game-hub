@@ -79,10 +79,22 @@ src/
 ## API Integration
 
 - **Base URL**: `https://api.rawg.io/api/`
-- **Authentication**: API key in query params
+- **Authentication**: API key in query params via environment variables
 - **Endpoints**: Games, genres, platforms, screenshots, trailers
 - **Pagination**: Infinite scroll implementation
 - **Error Handling**: Consistent error boundaries and fallbacks
+
+### Environment Setup
+
+**Required Environment Variables:**
+- `VITE_RAWG_API_KEY` - Your RAWG API key (get yours at https://rawg.io/apidocs)
+
+**Setup Instructions:**
+1. Copy `.env.example` to `.env.local`
+2. Replace `your_rawg_api_key_here` with your actual RAWG API key
+3. The application will automatically load the API key from environment variables
+
+**File Priority:** `.env.local` > `.env` > defaults
 
 ## Development Notes
 
