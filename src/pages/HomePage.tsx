@@ -1,6 +1,6 @@
 import { Box, Flex, Grid, GridItem, Hide, Show } from "@chakra-ui/react";
 import ActiveFilters from "../components/game/ActiveFilters";
-import AdvancedFilters from "../components/game/AdvancedFilters";
+import AdvancedFiltersDrawer from "../components/game/filters/AdvancedFiltersDrawer";
 import GameGrid from "../components/game/GameGrid";
 import GameHeading from "../components/game/GameHeading";
 import PlatformSelector from "../components/game/PlatformSelector";
@@ -39,7 +39,7 @@ function HomePage() {
           <Flex mb={4} gap={4}>
             <PlatformSelector />
             <SortSelector />
-            <AdvancedFilters />
+            <AdvancedFiltersDrawer />
           </Flex>
         </Hide>
         <ActiveFilters />
