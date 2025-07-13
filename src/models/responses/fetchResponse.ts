@@ -1,6 +1,6 @@
 export default interface FetchResponse<T> {
   count: number;
-  results: T[];
+  results: T;
   next: string;
   previous: string;
 }
