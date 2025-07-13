@@ -8,4 +8,14 @@ export default interface GameQuery {
   search?: string;
   page: number;
   pageSize: number;
+  // Advanced filtering options
+  metacriticMin?: number;
+  metacriticMax?: number;
+  releasedAfter?: string;
+  releasedBefore?: string;
+  tags?: string[];
+  publishers?: string[];
+  developers?: string[];
+  esrbRating?: string;
+  platforms?: number[];
 }

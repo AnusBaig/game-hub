@@ -1,5 +1,4 @@
-import { Button } from "@chakra-ui/button";
-import { Box } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import Loader from "../utils/Loader";
 
 interface Props {

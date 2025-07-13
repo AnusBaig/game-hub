@@ -1,5 +1,4 @@
-import Icon from "@chakra-ui/icon";
-import { Box } from "@chakra-ui/layout";
+import { Box, Icon } from "@chakra-ui/react";
 import { FaCheckCircle } from "react-icons/fa";
 
 const FinishLoading = () => {
