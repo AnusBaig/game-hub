@@ -6,6 +6,8 @@ export default interface GameTrailer {
 }
 
 interface GameTrailerVideo {
-  480: string;
-  max: string;
+  480?: string;
+  360?: string;
+  max?: string;
+  [key: string]: string | undefined;
 }

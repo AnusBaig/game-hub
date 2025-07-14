@@ -77,19 +77,25 @@ class MultiMediaService {
       })) || [];
 
       // Convert RAWG trailers to MediaItems  
-      const videos: MediaItem[] = trailersResponse?.results?.map((trailer) => ({
-        id: `rawg-video-${trailer.id}`,
-        type: 'video' as const,
-        url: trailer.data?.[480] || trailer.data?.max || '',
-        thumbnail: trailer.preview,
-        title: trailer.name,
-        source: 'rawg' as const,
-        gameId,
-        metadata: {
-          duration: 0, // RAWG doesn't provide duration
-          format: 'mp4',
-        }
-      })) || [];
+      const videos: MediaItem[] = trailersResponse?.results?.map((trailer) => {
+        // Use the best available video quality
+        const videoUrl = trailer.data?.[480] || trailer.data?.[360] || trailer.data?.max || '';
+        
+        return {
+          id: `rawg-video-${trailer.id}`,
+          type: 'video' as const,
+          url: videoUrl,
+          thumbnail: trailer.preview,
+          title: trailer.name,
+          source: 'rawg' as const,
+          gameId,
+          metadata: {
+            duration: 0, // RAWG doesn't provide duration
+            format: 'mp4',
+            originalUrl: videoUrl // Store original URL for debugging
+          }
+        };
+      }).filter(video => video.url) || []; // Filter out videos without URLs
 
       return {
         screenshots,

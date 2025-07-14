@@ -21,7 +21,7 @@ app.use((req, res, next) => {
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://youtube.com https://www.gstatic.com; " +
     "frame-src 'self' https://www.youtube.com https://youtube.com; " +
-    "media-src 'self' https://www.youtube.com https://youtube.com https://*.googlevideo.com; " +
+    "media-src 'self' https://www.youtube.com https://youtube.com https://*.googlevideo.com https://media.rawg.io https://videos.rawg.io https://video.rawg.io blob: data:; " +
     "img-src 'self' data: https:; " +
     "style-src 'self' 'unsafe-inline' https:; " +
     "connect-src 'self' https:; " +
@@ -45,7 +45,10 @@ app.get('/api/proxy-media', async (req, res) => {
   try {
     const { url } = req.query;
     
+    console.log('📦 Proxy request for:', url);
+    
     if (!url) {
+      console.error('❌ No URL provided');
       return res.status(400).json({ error: 'URL parameter is required' });
     }
 
@@ -56,7 +59,18 @@ app.get('/api/proxy-media', async (req, res) => {
       'img.youtube.com',
       'i.ytimg.com',
       'steamcdn-a.akamaihd.net',
-      'store.steampowered.com'
+      'steamcdn-b.akamaihd.net', 
+      'steamcdn-c.akamaihd.net',
+      'store.steampowered.com',
+      'steampowered.com',
+      'steamstatic.com',
+      'cdn.cloudflare.steamstatic.com',
+      'cdn.akamai.steamstatic.com',
+      'videos.rawg.io',
+      'video.rawg.io',
+      'rawg.io',
+      'api.rawg.io',
+      'cdn.rawg.io'
     ];
 
     const urlObj = new URL(url);
@@ -65,8 +79,11 @@ app.get('/api/proxy-media', async (req, res) => {
     );
 
     if (!isAllowed) {
+      console.error('❌ Domain not allowed:', urlObj.hostname);
       return res.status(403).json({ error: 'Domain not allowed' });
     }
+    
+    console.log('✅ Domain allowed, fetching media...');
 
     // Fetch the media from external source
     const response = await fetch(url, {
@@ -77,10 +94,13 @@ app.get('/api/proxy-media', async (req, res) => {
     });
 
     if (!response.ok) {
+      console.error('❌ Fetch failed:', response.status, response.statusText);
       return res.status(response.status).json({ 
         error: `Failed to fetch media: ${response.statusText}` 
       });
     }
+    
+    console.log('✅ Media fetched successfully, status:', response.status);
 
     // Get content type from response
     const contentType = response.headers.get('content-type') || 'application/octet-stream';
