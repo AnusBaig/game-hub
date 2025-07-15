@@ -32,20 +32,16 @@ interface YouTubeSearchResponse {
 }
 
 class YouTubeApiClient {
-  private apiKey: string;
-  private baseUrl = 'https://www.googleapis.com/youtube/v3';
-
-  constructor() {
-    this.apiKey = import.meta.env.VITE_YOUTUBE_API_KEY || '';
-  }
+  private proxyBaseUrl = '/api/youtube';
+  private isConfiguredCache: boolean | null = null;
 
   // Search for gaming videos related to a specific game
   async searchGameVideos(
     gameName: string, 
     maxResults: number = 10
   ): Promise<YouTubeVideo[]> {
-    if (!this.apiKey) {
-      console.log('YouTube API key not configured');
+    if (!(await this.isConfigured())) {
+      console.log('YouTube API not configured');
       return [];
     }
 
@@ -54,21 +50,21 @@ class YouTubeApiClient {
       const searchQuery = `${gameName} gameplay trailer review`;
       
       const response = await fetch(
-        `${this.baseUrl}/search?` +
+        `${this.proxyBaseUrl}/search?` +
         new URLSearchParams({
-          part: 'snippet',
           q: searchQuery,
-          type: 'video',
           maxResults: maxResults.toString(),
           order: 'relevance',
-          videoDuration: 'medium', // 4-20 minutes
-          videoDefinition: 'high',
-          key: this.apiKey,
-          safeSearch: 'moderate'
+          videoDuration: 'medium'
         })
       );
 
       if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.configured === false) {
+          console.log('YouTube API not configured on server');
+          return [];
+        }
         throw new Error(`YouTube API error: ${response.statusText}`);
       }
 
@@ -146,27 +142,14 @@ class YouTubeApiClient {
 
   // Get video details including statistics
   async getVideoDetails(videoIds: string[]): Promise<YouTubeVideo[]> {
-    if (!this.apiKey || videoIds.length === 0) {
+    if (!(await this.isConfigured()) || videoIds.length === 0) {
       return [];
     }
 
     try {
-      const response = await fetch(
-        `${this.baseUrl}/videos?` +
-        new URLSearchParams({
-          part: 'snippet,statistics',
-          id: videoIds.join(','),
-          key: this.apiKey
-        })
-      );
-
-      if (!response.ok) {
-        throw new Error(`YouTube API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.items || [];
-
+      // This would need to be implemented via proxy if needed
+      console.log('Video details endpoint not implemented via proxy yet');
+      return [];
     } catch (error) {
       console.error('Error fetching YouTube video details:', error);
       return [];
@@ -195,29 +178,32 @@ class YouTubeApiClient {
   }
 
   // Check if YouTube API is configured
-  isConfigured(): boolean {
-    return !!this.apiKey;
+  async isConfigured(): Promise<boolean> {
+    if (this.isConfiguredCache !== null) {
+      return this.isConfiguredCache;
+    }
+    
+    try {
+      const response = await fetch('/api/health');
+      if (response.ok) {
+        const data = await response.json();
+        this.isConfiguredCache = data.apis?.youtube || false;
+        return this.isConfiguredCache || false;
+      }
+      return false;
+    } catch {
+      return false;
+    }
   }
 
   // Get channel information
   async getChannelInfo(channelId: string) {
-    if (!this.apiKey) return null;
+    if (!(await this.isConfigured())) return null;
 
     try {
-      const response = await fetch(
-        `${this.baseUrl}/channels?` +
-        new URLSearchParams({
-          part: 'snippet,statistics',
-          id: channelId,
-          key: this.apiKey
-        })
-      );
-
-      if (!response.ok) return null;
-
-      const data = await response.json();
-      return data.items?.[0] || null;
-
+      // This would need to be implemented via proxy if needed
+      console.log('Channel info endpoint not implemented via proxy yet');
+      return null;
     } catch (error) {
       console.error('Error fetching channel info:', error);
       return null;

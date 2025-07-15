@@ -43,37 +43,34 @@ interface IGDBArtwork {
 }
 
 class IGDBApiClient {
-  private clientId: string;
-  private clientSecret: string;
   private accessToken: string | null = null;
   private tokenExpiry: number = 0;
-  private baseUrl = 'https://api.igdb.com/v4';
-  private authUrl = 'https://id.twitch.tv/oauth2/token';
+  private proxyBaseUrl = '/api/igdb';
+  private isConfiguredCache: boolean | null = null;
 
-  constructor() {
-    this.clientId = import.meta.env.VITE_IGDB_CLIENT_ID || '';
-    this.clientSecret = import.meta.env.VITE_IGDB_CLIENT_SECRET || '';
-  }
-
-  // Authenticate with Twitch OAuth to get IGDB access token
+  // Authenticate with Twitch OAuth to get IGDB access token via proxy
   private async authenticate(): Promise<string> {
     if (this.accessToken && Date.now() < this.tokenExpiry) {
       return this.accessToken;
     }
 
-    if (!this.clientId || !this.clientSecret) {
+    if (!(await this.isConfigured())) {
       throw new Error('IGDB credentials not configured');
     }
 
     try {
-      const response = await fetch(`${this.authUrl}?client_id=${this.clientId}&client_secret=${this.clientSecret}&grant_type=client_credentials`, {
+      const response = await fetch(`${this.proxyBaseUrl}/token`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.configured === false) {
+          throw new Error('IGDB credentials not configured on server');
+        }
         throw new Error(`IGDB authentication failed: ${response.statusText}`);
       }
 
@@ -94,10 +91,9 @@ class IGDBApiClient {
     const token = await this.authenticate();
 
     try {
-      const response = await fetch(`${this.baseUrl}/${endpoint}`, {
+      const response = await fetch(`${this.proxyBaseUrl}/${endpoint}`, {
         method: 'POST',
         headers: {
-          'Client-ID': this.clientId,
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
@@ -213,8 +209,22 @@ class IGDBApiClient {
   }
 
   // Check if IGDB is properly configured
-  isConfigured(): boolean {
-    return !!(this.clientId && this.clientSecret);
+  async isConfigured(): Promise<boolean> {
+    if (this.isConfiguredCache !== null) {
+      return this.isConfiguredCache;
+    }
+    
+    try {
+      const response = await fetch('/api/health');
+      if (response.ok) {
+        const data = await response.json();
+        this.isConfiguredCache = data.apis?.igdb || false;
+        return this.isConfiguredCache || false;
+      }
+      return false;
+    } catch {
+      return false;
+    }
   }
 }
 

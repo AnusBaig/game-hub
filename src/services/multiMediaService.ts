@@ -15,27 +15,67 @@ const trailersClient = new ApiClient<{ results: GameTrailer[] }>(Endpoints.FETCH
 class MultiMediaService {
   async getGameMedia(gameId: number, gameDetails?: { name: string; name_original: string; released?: string }): Promise<MediaCollection> {
     try {
-      // Fetch from multiple sources in parallel
-      const [rawgMedia, igdbMedia, youtubeMedia] = await Promise.all([
+      // Fetch from multiple sources in parallel with individual error handling
+      const [rawgMedia, igdbMedia, youtubeMedia, steamMedia] = await Promise.allSettled([
         this.getRawgMedia(gameId),
         gameDetails ? this.getIGDBMedia(gameId, gameDetails) : Promise.resolve({ screenshots: [], videos: [], artwork: [] }),
-        gameDetails ? this.getYouTubeMedia(gameDetails.name) : Promise.resolve({ videos: [] })
+        gameDetails ? this.getYouTubeMedia(gameDetails.name) : Promise.resolve({ videos: [] }),
+        gameDetails ? this.getSteamMedia(gameId, gameDetails.name) : Promise.resolve({ screenshots: [], videos: [], artwork: [] })
       ]);
 
+      // Extract successful results and log failures
+      const rawgResult = rawgMedia.status === 'fulfilled' ? rawgMedia.value : { screenshots: [], videos: [], artwork: [], total: 0 };
+      const igdbResult = igdbMedia.status === 'fulfilled' ? igdbMedia.value : { screenshots: [], videos: [], artwork: [] };
+      const youtubeResult = youtubeMedia.status === 'fulfilled' ? youtubeMedia.value : { videos: [] };
+      const steamResult = steamMedia.status === 'fulfilled' ? steamMedia.value : { screenshots: [], videos: [], artwork: [] };
+
+      // Log any failures
+      if (rawgMedia.status === 'rejected') console.warn('RAWG media fetch failed:', rawgMedia.reason);
+      if (igdbMedia.status === 'rejected') console.warn('IGDB media fetch failed:', igdbMedia.reason);
+      if (youtubeMedia.status === 'rejected') console.warn('YouTube media fetch failed:', youtubeMedia.reason);
+      if (steamMedia.status === 'rejected') console.warn('Steam media fetch failed:', steamMedia.reason);
+
       // Combine and deduplicate media from all sources
-      const combinedScreenshots = [...rawgMedia.screenshots, ...(igdbMedia.screenshots || [])];
-      const combinedVideos = [...rawgMedia.videos, ...(igdbMedia.videos || []), ...(youtubeMedia.videos || [])];
-      const combinedArtwork = [...rawgMedia.artwork, ...(igdbMedia.artwork || [])];
+      const combinedScreenshots = [
+        ...rawgResult.screenshots, 
+        ...(igdbResult.screenshots || []),
+        ...(steamResult.screenshots || [])
+      ];
+      const combinedVideos = [
+        ...rawgResult.videos, 
+        ...(igdbResult.videos || []), 
+        ...(youtubeResult.videos || []),
+        ...(steamResult.videos || [])
+      ];
+      const combinedArtwork = [
+        ...rawgResult.artwork, 
+        ...(igdbResult.artwork || []),
+        ...(steamResult.artwork || [])
+      ];
+
+      // Remove duplicate media based on URL similarity
+      const uniqueScreenshots = this.removeDuplicateMedia(combinedScreenshots);
+      const uniqueVideos = this.removeDuplicateMedia(combinedVideos);
+      const uniqueArtwork = this.removeDuplicateMedia(combinedArtwork);
 
       // Add content scoring to all images
-      const scoredScreenshots = await this.addContentScoring(combinedScreenshots);
-      const scoredArtwork = await this.addContentScoring(combinedArtwork);
+      const scoredScreenshots = await this.addContentScoring(uniqueScreenshots);
+      const scoredArtwork = await this.addContentScoring(uniqueArtwork);
+
+      // Count successful sources for logging
+      const sourcesUsed = [];
+      if (rawgResult.screenshots.length > 0 || rawgResult.videos.length > 0) sourcesUsed.push('RAWG');
+      if (igdbResult.screenshots?.length || igdbResult.videos?.length || igdbResult.artwork?.length) sourcesUsed.push('IGDB');
+      if (youtubeResult.videos?.length) sourcesUsed.push('YouTube');
+      if (steamResult.screenshots?.length || steamResult.videos?.length) sourcesUsed.push('Steam');
+
+      console.log(`Total media fetched: ${scoredScreenshots.length} screenshots, ${uniqueVideos.length} videos, ${scoredArtwork.length} artwork from ${sourcesUsed.join(', ') || 'no sources'}`);
 
       return {
         screenshots: scoredScreenshots,
-        videos: combinedVideos,
+        videos: uniqueVideos,
         artwork: scoredArtwork,
-        total: scoredScreenshots.length + combinedVideos.length + scoredArtwork.length
+        total: scoredScreenshots.length + uniqueVideos.length + scoredArtwork.length
       };
 
     } catch (error) {
@@ -117,7 +157,7 @@ class MultiMediaService {
 
   // Fetch media from IGDB API
   private async getIGDBMedia(gameId: number, gameDetails: { name: string; name_original: string; released?: string }): Promise<Partial<MediaCollection>> {
-    if (!igdbApiClient.isConfigured()) {
+    if (!(await igdbApiClient.isConfigured())) {
       console.log('IGDB not configured, skipping');
       return { screenshots: [], videos: [], artwork: [] };
     }
@@ -204,7 +244,7 @@ class MultiMediaService {
 
   // Fetch media from YouTube API
   private async getYouTubeMedia(gameName: string): Promise<{ videos: MediaItem[] }> {
-    if (!youtubeApiClient.isConfigured()) {
+    if (!(await youtubeApiClient.isConfigured())) {
       console.log('YouTube API not configured, skipping');
       return { videos: [] };
     }
@@ -245,14 +285,110 @@ class MultiMediaService {
     }
   }
 
-  // Future: Add Steam integration  
-  private async getSteamMedia(gameId: number): Promise<Partial<MediaCollection>> {
-    // TODO: Implement Steam API integration
-    return {
-      screenshots: [],
-      videos: [],
-      artwork: []
-    };
+  // Steam integration  
+  private async getSteamMedia(gameId: number, gameName?: string): Promise<Partial<MediaCollection>> {
+    try {
+      // Import steamApiClient
+      const steamApiClient = (await import('./steamApiClient')).default;
+      
+      if (!steamApiClient.isAvailable()) {
+        console.log('Steam API not available, skipping');
+        return { screenshots: [], videos: [], artwork: [] };
+      }
+
+      let steamAppDetails = null;
+      
+      // Try to get Steam app details by ID first
+      if (gameId) {
+        steamAppDetails = await steamApiClient.getAppDetails(gameId);
+      }
+      
+      // If no details found and we have a game name, try searching
+      if (!steamAppDetails && gameName) {
+        const searchResults = await steamApiClient.searchApps(gameName, 5);
+        if (searchResults.length > 0) {
+          // Try to get details for the first matching result
+          steamAppDetails = await steamApiClient.getAppDetails(searchResults[0].appid);
+        }
+      }
+
+      if (!steamAppDetails) {
+        return { screenshots: [], videos: [], artwork: [] };
+      }
+
+      // Convert Steam screenshots to MediaItems
+      const screenshots: MediaItem[] = steamAppDetails.screenshots?.map((screenshot, index) => ({
+        id: `steam-screenshot-${screenshot.id}`,
+        type: 'image' as const,
+        url: screenshot.path_full,
+        thumbnail: screenshot.path_thumbnail,
+        title: `Steam Screenshot ${index + 1}`,
+        source: 'steam' as const,
+        gameId,
+        width: 1920, // Steam screenshots are typically 1920x1080
+        height: 1080,
+      })) || [];
+
+      // Convert Steam videos to MediaItems
+      const videos: MediaItem[] = steamAppDetails.movies?.map((movie) => ({
+        id: `steam-video-${movie.id}`,
+        type: 'video' as const,
+        url: movie.mp4.max || movie.mp4[480] || '',
+        thumbnail: movie.thumbnail,
+        title: movie.name,
+        source: 'steam' as const,
+        gameId,
+        metadata: {
+          duration: 0, // Steam doesn't provide duration
+          format: 'mp4',
+          webmUrl: movie.webm.max || movie.webm[480] || '',
+        }
+      })).filter(video => video.url) || [];
+
+      console.log(`Steam fetched: ${screenshots.length} screenshots, ${videos.length} videos for "${gameName}"`);
+
+      return {
+        screenshots,
+        videos,
+        artwork: [] // Steam doesn't have separate artwork
+      };
+
+    } catch (error) {
+      console.error('Error fetching Steam media:', error);
+      return {
+        screenshots: [],
+        videos: [],
+        artwork: []
+      };
+    }
+  }
+
+  // Remove duplicate media items based on URL similarity
+  private removeDuplicateMedia(mediaItems: MediaItem[]): MediaItem[] {
+    const seen = new Set<string>();
+    const uniqueItems: MediaItem[] = [];
+
+    for (const item of mediaItems) {
+      // Create a normalized URL for comparison
+      const normalizedUrl = this.normalizeMediaUrl(item.url);
+      
+      if (!seen.has(normalizedUrl)) {
+        seen.add(normalizedUrl);
+        uniqueItems.push(item);
+      }
+    }
+
+    return uniqueItems;
+  }
+
+  // Normalize media URLs for duplicate detection
+  private normalizeMediaUrl(url: string): string {
+    return url
+      .toLowerCase()
+      .replace(/https?:\/\//, '') // Remove protocol
+      .replace(/\/+$/, '') // Remove trailing slashes
+      .replace(/\?.*$/, '') // Remove query parameters
+      .replace(/#.*$/, ''); // Remove fragments
   }
 
   // Add content scoring to media items
