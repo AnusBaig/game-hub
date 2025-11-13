@@ -7,6 +7,8 @@ import contentModerationService from "./contentModerationService";
 import igdbApiClient from "./igdbApiClient";
 import gameMappingService from "./gameMappingService";
 import youtubeApiClient from "./youtubeApiClient";
+import adultGameApiClient from "./adultGameApiClient";
+import adultVideoApiClient from "./adultVideoApiClient";
 
 // Use existing API clients
 const screenshotsClient = new ApiClient<{ results: GameScreenshot[] }>(Endpoints.FETCH_GAME_SCREENSHOTS);
@@ -16,47 +18,59 @@ class MultiMediaService {
   async getGameMedia(gameId: number, gameDetails?: { name: string; name_original: string; released?: string }): Promise<MediaCollection> {
     try {
       // Fetch from multiple sources in parallel with individual error handling
-      const [rawgMedia, igdbMedia, youtubeMedia, steamMedia] = await Promise.allSettled([
+      const [rawgMedia, igdbMedia, youtubeMedia, steamMedia, adultMedia] = await Promise.allSettled([
         this.getRawgMedia(gameId),
         gameDetails ? this.getIGDBMedia(gameId, gameDetails) : Promise.resolve({ screenshots: [], videos: [], artwork: [] }),
-        gameDetails ? this.getYouTubeMedia(gameDetails.name) : Promise.resolve({ videos: [] }),
-        gameDetails ? this.getSteamMedia(gameId, gameDetails.name) : Promise.resolve({ screenshots: [], videos: [], artwork: [] })
+        gameDetails ? this.getYouTubeMedia(gameDetails.name) : Promise.resolve({ videos: [], gameplay: [] }),
+        gameDetails ? this.getSteamMedia(gameId, gameDetails.name) : Promise.resolve({ screenshots: [], videos: [], artwork: [] }),
+        gameDetails ? this.getAdultPlatformMedia(gameId, gameDetails.name) : Promise.resolve({ screenshots: [], videos: [], artwork: [], gameplay: [] })
       ]);
 
       // Extract successful results and log failures
-      const rawgResult = rawgMedia.status === 'fulfilled' ? rawgMedia.value : { screenshots: [], videos: [], artwork: [], total: 0 };
+      const rawgResult = rawgMedia.status === 'fulfilled' ? rawgMedia.value : { screenshots: [], videos: [], artwork: [], gameplay: [], total: 0 };
       const igdbResult = igdbMedia.status === 'fulfilled' ? igdbMedia.value : { screenshots: [], videos: [], artwork: [] };
-      const youtubeResult = youtubeMedia.status === 'fulfilled' ? youtubeMedia.value : { videos: [] };
+      const youtubeResult = youtubeMedia.status === 'fulfilled' ? youtubeMedia.value : { videos: [], gameplay: [] };
       const steamResult = steamMedia.status === 'fulfilled' ? steamMedia.value : { screenshots: [], videos: [], artwork: [] };
+      const adultResult = adultMedia.status === 'fulfilled' ? adultMedia.value : { screenshots: [], videos: [], artwork: [], gameplay: [] };
 
       // Log any failures
       if (rawgMedia.status === 'rejected') console.warn('RAWG media fetch failed:', rawgMedia.reason);
       if (igdbMedia.status === 'rejected') console.warn('IGDB media fetch failed:', igdbMedia.reason);
       if (youtubeMedia.status === 'rejected') console.warn('YouTube media fetch failed:', youtubeMedia.reason);
       if (steamMedia.status === 'rejected') console.warn('Steam media fetch failed:', steamMedia.reason);
+      if (adultMedia.status === 'rejected') console.warn('Adult platform media fetch failed:', adultMedia.reason);
 
       // Combine and deduplicate media from all sources
       const combinedScreenshots = [
-        ...rawgResult.screenshots, 
+        ...rawgResult.screenshots,
         ...(igdbResult.screenshots || []),
-        ...(steamResult.screenshots || [])
+        ...(steamResult.screenshots || []),
+        ...(adultResult.screenshots || [])
       ];
       const combinedVideos = [
-        ...rawgResult.videos, 
-        ...(igdbResult.videos || []), 
+        ...rawgResult.videos,
+        ...(igdbResult.videos || []),
         ...(youtubeResult.videos || []),
-        ...(steamResult.videos || [])
+        ...(steamResult.videos || []),
+        ...(adultResult.videos || [])
       ];
       const combinedArtwork = [
-        ...rawgResult.artwork, 
+        ...rawgResult.artwork,
         ...(igdbResult.artwork || []),
-        ...(steamResult.artwork || [])
+        ...(steamResult.artwork || []),
+        ...(adultResult.artwork || [])
+      ];
+      const combinedGameplay = [
+        ...(rawgResult.gameplay || []),
+        ...(youtubeResult.gameplay || []),
+        ...(adultResult.gameplay || [])
       ];
 
       // Remove duplicate media based on URL similarity
       const uniqueScreenshots = this.removeDuplicateMedia(combinedScreenshots);
       const uniqueVideos = this.removeDuplicateMedia(combinedVideos);
       const uniqueArtwork = this.removeDuplicateMedia(combinedArtwork);
+      const uniqueGameplay = this.removeDuplicateMedia(combinedGameplay);
 
       // Add content scoring to all images
       const scoredScreenshots = await this.addContentScoring(uniqueScreenshots);
@@ -66,16 +80,18 @@ class MultiMediaService {
       const sourcesUsed = [];
       if (rawgResult.screenshots.length > 0 || rawgResult.videos.length > 0) sourcesUsed.push('RAWG');
       if (igdbResult.screenshots?.length || igdbResult.videos?.length || igdbResult.artwork?.length) sourcesUsed.push('IGDB');
-      if (youtubeResult.videos?.length) sourcesUsed.push('YouTube');
+      if (youtubeResult.videos?.length || youtubeResult.gameplay?.length) sourcesUsed.push('YouTube');
       if (steamResult.screenshots?.length || steamResult.videos?.length) sourcesUsed.push('Steam');
+      if (adultResult.screenshots?.length || adultResult.videos?.length || adultResult.artwork?.length || adultResult.gameplay?.length) sourcesUsed.push('Adult Platforms');
 
-      console.log(`Total media fetched: ${scoredScreenshots.length} screenshots, ${uniqueVideos.length} videos, ${scoredArtwork.length} artwork from ${sourcesUsed.join(', ') || 'no sources'}`);
+      console.log(`Total media fetched: ${scoredScreenshots.length} screenshots, ${uniqueVideos.length} videos, ${scoredArtwork.length} artwork, ${uniqueGameplay.length} gameplay from ${sourcesUsed.join(', ') || 'no sources'}`);
 
       return {
         screenshots: scoredScreenshots,
         videos: uniqueVideos,
         artwork: scoredArtwork,
-        total: scoredScreenshots.length + uniqueVideos.length + scoredArtwork.length
+        gameplay: uniqueGameplay,
+        total: scoredScreenshots.length + uniqueVideos.length + scoredArtwork.length + uniqueGameplay.length
       };
 
     } catch (error) {
@@ -84,6 +100,7 @@ class MultiMediaService {
         screenshots: [],
         videos: [],
         artwork: [],
+        gameplay: [],
         total: 0
       };
     }
@@ -141,6 +158,7 @@ class MultiMediaService {
         screenshots,
         videos,
         artwork: [], // RAWG doesn't have artwork
+        gameplay: [], // RAWG trailers are not gameplay videos
         total: screenshots.length + videos.length
       };
 
@@ -150,6 +168,7 @@ class MultiMediaService {
         screenshots: [],
         videos: [],
         artwork: [],
+        gameplay: [],
         total: 0
       };
     }
@@ -242,46 +261,65 @@ class MultiMediaService {
     }
   }
 
-  // Fetch media from YouTube API
-  private async getYouTubeMedia(gameName: string): Promise<{ videos: MediaItem[] }> {
+  // Fetch media from YouTube API (includes gameplay videos)
+  private async getYouTubeMedia(gameName: string): Promise<{ videos: MediaItem[]; gameplay: MediaItem[] }> {
     if (!(await youtubeApiClient.isConfigured())) {
       console.log('YouTube API not configured, skipping');
-      return { videos: [] };
+      return { videos: [], gameplay: [] };
     }
 
     try {
-      // Search for game-related videos on YouTube
-      const youtubeVideos = await youtubeApiClient.searchGameVideos(gameName, 8);
+      // Search for game-related videos on YouTube (including gameplay)
+      const youtubeVideos = await youtubeApiClient.searchGameVideos(`${gameName} gameplay`, 10);
 
       if (youtubeVideos.length === 0) {
-        return { videos: [] };
+        return { videos: [], gameplay: [] };
       }
 
-      // Convert YouTube videos to MediaItems
-      const videos: MediaItem[] = youtubeVideos.map((video, index) => ({
-        id: `youtube-video-${video.id.videoId}`,
-        type: 'video' as const,
-        url: youtubeApiClient.getVideoUrl(video.id.videoId),
-        thumbnail: youtubeApiClient.getThumbnailUrl(video, 'high'),
-        title: video.snippet.title,
-        description: video.snippet.description.substring(0, 200) + '...',
-        source: 'youtube' as const,
-        gameId: 0, // YouTube videos don't have a gameId
-        metadata: {
-          duration: 0, // YouTube search doesn't provide duration
-          format: 'youtube',
-          tags: [video.snippet.channelTitle],
-          uploadDate: video.snippet.publishedAt,
+      // Separate gameplay videos from regular trailers based on title/description
+      const gameplay: MediaItem[] = [];
+      const videos: MediaItem[] = [];
+
+      youtubeVideos.forEach((video, index) => {
+        const titleLower = video.snippet.title.toLowerCase();
+        const descLower = video.snippet.description.toLowerCase();
+        const isGameplay = titleLower.includes('gameplay') ||
+                          titleLower.includes('playthrough') ||
+                          titleLower.includes('walkthrough') ||
+                          titleLower.includes('let\'s play') ||
+                          descLower.includes('gameplay');
+
+        const mediaItem: MediaItem = {
+          id: `youtube-video-${video.id.videoId}`,
+          type: 'video' as const,
+          url: youtubeApiClient.getVideoUrl(video.id.videoId),
+          thumbnail: youtubeApiClient.getThumbnailUrl(video, 'high'),
+          title: video.snippet.title,
+          description: video.snippet.description.substring(0, 200) + '...',
+          source: 'youtube' as const,
+          gameId: 0, // YouTube videos don't have a gameId
+          metadata: {
+            duration: 0, // YouTube search doesn't provide duration
+            format: 'youtube',
+            tags: [video.snippet.channelTitle, ...(isGameplay ? ['gameplay'] : ['trailer'])],
+            uploadDate: video.snippet.publishedAt,
+          }
+        };
+
+        if (isGameplay) {
+          gameplay.push(mediaItem);
+        } else {
+          videos.push(mediaItem);
         }
-      }));
+      });
 
-      console.log(`YouTube fetched: ${videos.length} videos for "${gameName}"`);
+      console.log(`YouTube fetched: ${videos.length} trailers, ${gameplay.length} gameplay videos for "${gameName}"`);
 
-      return { videos };
+      return { videos, gameplay };
 
     } catch (error) {
       console.error('Error fetching YouTube media:', error);
-      return { videos: [] };
+      return { videos: [], gameplay: [] };
     }
   }
 
@@ -363,6 +401,104 @@ class MultiMediaService {
     }
   }
 
+  // Fetch media from adult game platforms AND adult video platforms
+  // Get playable video URL for adult videos
+  async getPlayableVideoUrl(mediaItem: MediaItem): Promise<string | null> {
+    try {
+      const format = mediaItem.metadata?.format as string;
+
+      // Only process adult platform videos
+      const adultFormats = ['pornhub', 'xvideos', 'redtube', 'xhamster'];
+      if (!adultFormats.includes(format)) {
+        console.log(`Not an adult video format: ${format}, returning original URL`);
+        return mediaItem.url || null;
+      }
+
+      // Check if URL is already a video file URL (not a webpage)
+      const videoExtensions = ['.mp4', '.webm', '.m3u8'];
+      const isVideoUrl = videoExtensions.some(ext => mediaItem.url?.toLowerCase().includes(ext));
+
+      if (isVideoUrl) {
+        console.log(`URL is already a video file: ${mediaItem.url}`);
+        return mediaItem.url;
+      }
+
+      // Fetch playable URL from API
+      console.log(`Fetching playable URL for ${format} video: ${mediaItem.id}`);
+      const playableUrl = await adultVideoApiClient.getVideoUrl(mediaItem);
+
+      if (playableUrl) {
+        console.log(`✅ Got playable URL for ${format} video`);
+        return playableUrl;
+      } else {
+        console.warn(`⚠️ Could not get playable URL for ${format} video, falling back to page URL`);
+        return mediaItem.url || null;
+      }
+
+    } catch (error) {
+      console.error('Error getting playable video URL:', error);
+      return mediaItem.url || null;
+    }
+  }
+
+  private async getAdultPlatformMedia(gameId: number, gameName: string): Promise<Partial<MediaCollection>> {
+    if (!adultGameApiClient.isAdultContentEnabled()) {
+      console.log('Adult content is disabled');
+      return { screenshots: [], videos: [], artwork: [], gameplay: [] };
+    }
+
+    try {
+      // Fetch from both adult game platforms and adult video platforms in parallel
+      const [gameMedia, allVideoResults] = await Promise.allSettled([
+        // Adult game platforms (Nutaku, DLsite, Itch.io)
+        adultGameApiClient.isConfigured()
+          ? adultGameApiClient.getAllAdultPlatformMedia(gameName, gameId)
+          : Promise.resolve({ screenshots: [], videos: [], artwork: [], gameplay: [] }),
+        // Adult video platforms (Pornhub, RedTube, xVideos, xHamster)
+        adultVideoApiClient.isEnabled()
+          ? adultVideoApiClient.searchAllPlatforms(gameName, 8)
+          : Promise.resolve([])
+      ]);
+
+      const gameResult = gameMedia.status === 'fulfilled' ? gameMedia.value : { screenshots: [], videos: [], artwork: [], gameplay: [] };
+      const videoResult = allVideoResults.status === 'fulfilled' ? allVideoResults.value : [];
+
+      // Separate gameplay videos from regular videos based on metadata.isGameplay flag
+      const gameplayVideos = videoResult.filter(video => video.metadata?.isGameplay);
+      const regularVideos = videoResult.filter(video => !video.metadata?.isGameplay);
+
+      // Combine gameplay from both sources
+      const combinedGameplay = [
+        ...(gameResult.gameplay || []),
+        ...gameplayVideos
+      ];
+
+      // Combine regular videos from both sources
+      const combinedVideos = [
+        ...(gameResult.videos || []),
+        ...regularVideos
+      ];
+
+      console.log(`Adult platforms fetched: ${gameResult.screenshots.length} screenshots, ${combinedVideos.length} videos (${regularVideos.length} from video platforms), ${gameResult.artwork.length} artwork, ${combinedGameplay.length} gameplay (${gameplayVideos.length} from video platforms)`);
+
+      return {
+        screenshots: gameResult.screenshots,
+        videos: combinedVideos,
+        artwork: gameResult.artwork,
+        gameplay: combinedGameplay
+      };
+
+    } catch (error) {
+      console.error('Error fetching adult platform media:', error);
+      return {
+        screenshots: [],
+        videos: [],
+        artwork: [],
+        gameplay: []
+      };
+    }
+  }
+
   // Remove duplicate media items based on URL similarity
   private removeDuplicateMedia(mediaItems: MediaItem[]): MediaItem[] {
     const seen = new Set<string>();
@@ -427,6 +563,72 @@ class MultiMediaService {
       console.error('Error adding content scoring:', error);
       return mediaItems; // Return original items if scoring fails
     }
+  }
+
+  // Public methods for progressive loading - expose individual source methods
+  async getRawgMediaOnly(gameId: number): Promise<MediaCollection> {
+    const rawgMedia = await this.getRawgMedia(gameId);
+
+    // Add content scoring to screenshots and artwork
+    const scoredScreenshots = await this.addContentScoring(rawgMedia.screenshots);
+    const scoredArtwork = await this.addContentScoring(rawgMedia.artwork);
+
+    return {
+      screenshots: scoredScreenshots,
+      videos: rawgMedia.videos,
+      artwork: scoredArtwork,
+      gameplay: rawgMedia.gameplay,
+      total: scoredScreenshots.length + rawgMedia.videos.length + scoredArtwork.length + rawgMedia.gameplay.length
+    };
+  }
+
+  async getIGDBMediaOnly(gameId: number, gameDetails: { name: string; name_original: string; released?: string }): Promise<Partial<MediaCollection>> {
+    const igdbMedia = await this.getIGDBMedia(gameId, gameDetails);
+
+    // Add content scoring to screenshots and artwork
+    const scoredScreenshots = await this.addContentScoring(igdbMedia.screenshots || []);
+    const scoredArtwork = await this.addContentScoring(igdbMedia.artwork || []);
+
+    return {
+      screenshots: scoredScreenshots,
+      videos: igdbMedia.videos,
+      artwork: scoredArtwork,
+      gameplay: [] // IGDB doesn't have gameplay videos
+    };
+  }
+
+  async getYouTubeMediaOnly(gameName: string): Promise<{ videos: MediaItem[]; gameplay: MediaItem[] }> {
+    return await this.getYouTubeMedia(gameName);
+  }
+
+  async getSteamMediaOnly(gameId: number, gameName?: string): Promise<Partial<MediaCollection>> {
+    const steamMedia = await this.getSteamMedia(gameId, gameName);
+
+    // Add content scoring to screenshots and artwork
+    const scoredScreenshots = await this.addContentScoring(steamMedia.screenshots || []);
+    const scoredArtwork = await this.addContentScoring(steamMedia.artwork || []);
+
+    return {
+      screenshots: scoredScreenshots,
+      videos: steamMedia.videos,
+      artwork: scoredArtwork,
+      gameplay: [] // Steam doesn't have dedicated gameplay videos
+    };
+  }
+
+  async getAdultPlatformMediaOnly(gameId: number, gameName: string): Promise<Partial<MediaCollection>> {
+    const adultMedia = await this.getAdultPlatformMedia(gameId, gameName);
+
+    // Add content scoring to screenshots and artwork
+    const scoredScreenshots = await this.addContentScoring(adultMedia.screenshots || []);
+    const scoredArtwork = await this.addContentScoring(adultMedia.artwork || []);
+
+    return {
+      screenshots: scoredScreenshots,
+      videos: adultMedia.videos,
+      artwork: scoredArtwork,
+      gameplay: adultMedia.gameplay
+    };
   }
 }
 

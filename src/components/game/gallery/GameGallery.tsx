@@ -1,7 +1,7 @@
-import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, Spinner, Text } from "@chakra-ui/react";
+import { useState, useMemo } from "react";
 import { MediaCollection, MediaItem } from "../../../models/mediaItem";
-import useGameMedia from "../../../hooks/useGameMedia";
+import useProgressiveGameMedia from "../../../hooks/useProgressiveGameMedia";
 import useGameDetail from "../../../hooks/useGameDetail";
 import Loader from "../../utils/Loader";
 import SectionHeading from "../../utils/SectionHeading";
@@ -20,15 +20,16 @@ const GameGallery = ({ gameId }: Props) => {
     released: gameDetail.released
   } : undefined;
   
-  const { data: mediaCollection, isLoading, error } = useGameMedia(gameId, gameDetails);
+  const { data: mediaCollection, isLoading, isStillLoading, error } = useProgressiveGameMedia(gameId, gameDetails);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const [openInEditMode, setOpenInEditMode] = useState(false);
 
-  if (isLoading) return <Loader />;
+  // Show loader only if no data available yet
+  if (isLoading && mediaCollection.total === 0) return <Loader />;
   if (error || !mediaCollection) return null;
 
-  const { screenshots, videos, artwork } = mediaCollection;
+  const { screenshots, videos, artwork, gameplay } = mediaCollection;
 
   const handleMediaSelect = (media: MediaItem) => {
     setSelectedMedia(media);
@@ -50,9 +51,13 @@ const GameGallery = ({ gameId }: Props) => {
       case 0: return screenshots;
       case 1: return videos;
       case 2: return artwork;
+      case 3: return gameplay;
       default: return screenshots;
     }
   };
+
+  // Get current tab's media - arrays should be stable from the hook
+  const currentTabMedia = getMediaForTab(selectedTab);
 
   return (
     <Box my={5}>
@@ -68,6 +73,7 @@ const GameGallery = ({ gameId }: Props) => {
           <Tab>Screenshots ({screenshots.length})</Tab>
           <Tab>Videos ({videos.length})</Tab>
           <Tab>Artwork ({artwork.length})</Tab>
+          <Tab>GamePlay ({gameplay.length})</Tab>
         </TabList>
 
         <TabPanels>
@@ -77,6 +83,18 @@ const GameGallery = ({ gameId }: Props) => {
               onMediaSelect={handleMediaSelect}
               onEditMedia={handleEditMedia}
             />
+            {isStillLoading && (
+              <Flex 
+                justify="center" 
+                align="center" 
+                py={4} 
+                gap={2}
+                color="gray.500"
+              >
+                <Spinner size="sm" />
+                <Text fontSize="sm">Loading more content...</Text>
+              </Flex>
+            )}
           </TabPanel>
           
           <TabPanel px={0}>
@@ -85,14 +103,58 @@ const GameGallery = ({ gameId }: Props) => {
               onMediaSelect={handleMediaSelect}
               onEditMedia={handleEditMedia}
             />
+            {isStillLoading && (
+              <Flex 
+                justify="center" 
+                align="center" 
+                py={4} 
+                gap={2}
+                color="gray.500"
+              >
+                <Spinner size="sm" />
+                <Text fontSize="sm">Loading more content...</Text>
+              </Flex>
+            )}
           </TabPanel>
           
           <TabPanel px={0}>
-            <MediaGrid 
+            <MediaGrid
               media={artwork}
               onMediaSelect={handleMediaSelect}
               onEditMedia={handleEditMedia}
             />
+            {isStillLoading && (
+              <Flex
+                justify="center"
+                align="center"
+                py={4}
+                gap={2}
+                color="gray.500"
+              >
+                <Spinner size="sm" />
+                <Text fontSize="sm">Loading more content...</Text>
+              </Flex>
+            )}
+          </TabPanel>
+
+          <TabPanel px={0}>
+            <MediaGrid
+              media={gameplay}
+              onMediaSelect={handleMediaSelect}
+              onEditMedia={handleEditMedia}
+            />
+            {isStillLoading && (
+              <Flex
+                justify="center"
+                align="center"
+                py={4}
+                gap={2}
+                color="gray.500"
+              >
+                <Spinner size="sm" />
+                <Text fontSize="sm">Loading more gameplay...</Text>
+              </Flex>
+            )}
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -100,11 +162,12 @@ const GameGallery = ({ gameId }: Props) => {
       {selectedMedia && (
         <MediaViewer
           media={selectedMedia}
-          allMedia={getMediaForTab(selectedTab)}
+          allMedia={currentTabMedia}
           isOpen={!!selectedMedia}
           onClose={handleCloseViewer}
           onMediaChange={setSelectedMedia}
           initialEditMode={openInEditMode}
+          isStillLoading={isStillLoading}
         />
       )}
     </Box>

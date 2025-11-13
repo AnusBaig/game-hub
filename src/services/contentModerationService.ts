@@ -139,17 +139,26 @@ class ContentModerationService {
   }
 
   private determineCategory(
-    primaryContent: 'nudity' | 'weapon' | 'alcohol' | 'safe', 
+    primaryContent: 'nudity' | 'weapon' | 'alcohol' | 'safe',
     primaryScore: number
-  ): 'safe' | 'suggestive' | 'partial' | 'explicit' | 'erotic' | 'brutal' | 'cockeyed' {
+  ): 'safe' | 'suggestive' | 'partial' | 'explicit' | 'erotic' | 'brutal' | 'cockeyed' | 'adult' | 'mature' | 'explicit_adult' {
     // High-score categories for specific content types (>85%)
     if (primaryScore > 85) {
-      if (primaryContent === 'nudity') return 'erotic';
+      if (primaryContent === 'nudity') return 'explicit_adult'; // Extreme adult content
       if (primaryContent === 'weapon') return 'brutal';
       if (primaryContent === 'alcohol') return 'cockeyed';
     }
-    
-    // Existing score-based categories
+
+    // Adult content categories for nudity (more granular)
+    if (primaryContent === 'nudity') {
+      if (primaryScore >= 70) return 'erotic'; // Heavy nudity
+      if (primaryScore >= 50) return 'adult'; // Significant nudity
+      if (primaryScore >= 30) return 'mature'; // Moderate nudity
+      if (primaryScore >= 15) return 'partial'; // Partial nudity
+      if (primaryScore >= 10) return 'suggestive'; // Suggestive content
+    }
+
+    // Existing score-based categories for non-nudity content
     if (primaryScore < 10) return 'safe';
     if (primaryScore < 30) return 'suggestive';
     if (primaryScore < 60) return 'partial';
@@ -252,6 +261,68 @@ class ContentModerationService {
   // Check if content moderation is available
   isConfigured(): boolean {
     return !!(this.apiKey && this.apiSecret);
+  }
+
+  // Get content rating based on category
+  getContentRating(category: string): 'safe' | 'teen' | 'mature' | 'adult' | 'explicit' {
+    switch (category) {
+      case 'safe':
+        return 'safe';
+      case 'suggestive':
+        return 'teen';
+      case 'partial':
+      case 'mature':
+        return 'mature';
+      case 'explicit':
+      case 'adult':
+        return 'adult';
+      case 'erotic':
+      case 'explicit_adult':
+      case 'brutal':
+      case 'cockeyed':
+        return 'explicit';
+      default:
+        return 'safe';
+    }
+  }
+
+  // Check if content requires age verification
+  requiresAgeVerification(contentScore?: ContentScore): boolean {
+    if (!contentScore) return false;
+
+    const adultCategories = ['adult', 'erotic', 'explicit_adult'];
+    const highScoreThreshold = 50; // 50% or higher in any category
+
+    return (
+      adultCategories.includes(contentScore.category) ||
+      contentScore.nudityScore >= highScoreThreshold ||
+      contentScore.primaryScore >= 70
+    );
+  }
+
+  // Get content warning message
+  getContentWarning(contentScore?: ContentScore): string | null {
+    if (!contentScore) return null;
+
+    switch (contentScore.category) {
+      case 'explicit_adult':
+        return 'This content contains explicit adult material. Viewer discretion is strongly advised.';
+      case 'erotic':
+        return 'This content contains mature adult themes and nudity. 18+ only.';
+      case 'adult':
+        return 'This content contains adult themes. May not be suitable for all audiences.';
+      case 'mature':
+        return 'This content may contain mature themes. Viewer discretion advised.';
+      case 'brutal':
+        return 'This content contains graphic violence and weapons. Viewer discretion advised.';
+      case 'cockeyed':
+        return 'This content contains alcohol and substance references.';
+      case 'partial':
+      case 'suggestive':
+        return 'This content may contain suggestive themes.';
+      default:
+        return null;
+    }
   }
 }
 

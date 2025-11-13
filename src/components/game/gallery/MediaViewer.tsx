@@ -14,7 +14,9 @@ import {
   VStack,
   Badge,
   Divider,
-  useToast
+  useToast,
+  Flex,
+  Spinner
 } from "@chakra-ui/react";
 import { 
   FaChevronLeft, 
@@ -38,9 +40,10 @@ interface Props {
   onClose: () => void;
   onMediaChange: (media: MediaItem) => void;
   initialEditMode?: boolean;
+  isStillLoading?: boolean;
 }
 
-const MediaViewer = ({ media, allMedia, isOpen, onClose, onMediaChange, initialEditMode = false }: Props) => {
+const MediaViewer = ({ media, allMedia, isOpen, onClose, onMediaChange, initialEditMode = false, isStillLoading = false }: Props) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -383,11 +386,14 @@ const MediaViewer = ({ media, allMedia, isOpen, onClose, onMediaChange, initialE
 
             {/* Media Content */}
             {media.type === 'video' ? (
-              <VideoPlayer 
-                media={media}
-                showControls={true}
-                onDownload={handleDownload}
-              />
+              <Box w="100%" maxW="1200px" px={4}>
+                <VideoPlayer
+                  media={media}
+                  autoplay={true}
+                  showControls={true}
+                  onDownload={!isYouTubeVideo ? handleDownload : undefined}
+                />
+              </Box>
             ) : (
               <Image
                 src={media.url}
@@ -431,6 +437,25 @@ const MediaViewer = ({ media, allMedia, isOpen, onClose, onMediaChange, initialE
                 )}
               </VStack>
             </Box>
+
+            {/* Loading indicator for more content */}
+            {isStillLoading && (
+              <Flex 
+                position="absolute"
+                bottom={4}
+                left={4}
+                align="center" 
+                gap={2}
+                bg="rgba(0,0,0,0.7)"
+                color="white"
+                p={2}
+                borderRadius="md"
+                fontSize="sm"
+              >
+                <Spinner size="sm" />
+                <Text>Loading more content...</Text>
+              </Flex>
+            )}
           </Box>
         </ModalBody>
       </ModalContent>

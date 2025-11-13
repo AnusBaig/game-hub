@@ -5,12 +5,13 @@ export interface MediaItem {
   thumbnail?: string;
   title?: string;
   description?: string;
-  source: 'rawg' | 'igdb' | 'steam' | 'youtube';
+  source: 'rawg' | 'igdb' | 'steam' | 'youtube' | 'nutaku' | 'dlsite' | 'f95zone' | 'itch';
   gameId: number;
   width?: number;
   height?: number;
   fileSize?: number;
   contentScore?: ContentScore;
+  contentRating?: 'safe' | 'teen' | 'mature' | 'adult' | 'explicit';
   metadata?: MediaMetadata;
 }
 
@@ -25,7 +26,7 @@ export interface ContentScore {
   alcoholScore: number; // 0-100
   
   // Content category based on primary content type and score
-  category: 'safe' | 'suggestive' | 'partial' | 'explicit' | 'erotic' | 'brutal' | 'cockeyed';
+  category: 'safe' | 'suggestive' | 'partial' | 'explicit' | 'erotic' | 'brutal' | 'cockeyed' | 'adult' | 'mature' | 'explicit_adult';
   confidence: number; // 0-1
   timestamp: number;
 }
@@ -42,5 +43,6 @@ export interface MediaCollection {
   screenshots: MediaItem[];
   videos: MediaItem[];
   artwork: MediaItem[];
+  gameplay: MediaItem[]; // Dedicated gameplay videos section
   total: number;
 }
