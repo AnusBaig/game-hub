@@ -19,6 +19,7 @@ export default interface Game {
   playtime: number;
   suggestions_count: number;
   updated: string;
+  source: string;
   esrb_rating: EsrbRating;
   platforms: Platform[];
   parent_platforms: Platform[];

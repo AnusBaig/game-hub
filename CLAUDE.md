@@ -8,10 +8,11 @@ Game Hub is a React + TypeScript + Vite application that serves as a game discov
 
 ## Development Commands
 
-- `npm run dev` - Start development server on port 3500 with host binding
+- `npm run dev` - Start Vite development server on port 3500
+- `npm run dev:server` - Start Express proxy server on port 3501  
 - `npm run build` - Build for production (runs TypeScript compiler then Vite build)
 - `npm run preview` - Preview production build locally
-- `npm start` - Start Express server (server.js)
+- `npm start` - Start Express server for production (includes static file serving)
 
 ## Architecture Overview
 
@@ -21,6 +22,12 @@ Game Hub is a React + TypeScript + Vite application that serves as a game discov
 - **Routing**: React Router v6 with nested routes (/games, /games/:id)
 - **Styling**: Chakra UI with custom theme (dark mode default) + Bootstrap
 - **API Integration**: Axios-based API client with RAWG API integration
+
+### Backend Architecture
+- **Express Proxy Server**: Handles CORS issues for external media downloads
+- **Media Proxy Endpoint**: `/api/proxy-media` routes external image/video requests
+- **Static File Serving**: Serves production build in deployment
+- **Security**: Domain whitelist for allowed external media sources
 
 ### Key Architectural Patterns
 - **Custom Hooks**: Reusable data fetching hooks (useGames, useGenres, etc.)

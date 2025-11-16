@@ -4,8 +4,7 @@ import useGameDetail from "../../hooks/useGameDetail";
 import ExpandableText from "../utils/ExpandableText";
 import Loader from "../utils/Loader";
 import GameAttributeGrid from "./GameAttributeGrid";
-import GameScreenshots from "./GameScreenshots";
-import GameTrailer from "./trailer/GameTrailer";
+import GameGallery from "./gallery/GameGallery";
 
 const GameDetail = () => {
   const { id } = useParams();
@@ -37,8 +36,7 @@ const GameDetail = () => {
         />
       </GridItem>
       <GridItem>
-        <GameTrailer gameId={game.id} />
-        <GameScreenshots gameId={game.id} />
+        <GameGallery gameId={game.id} />
       </GridItem>
     </SimpleGrid>
   );
