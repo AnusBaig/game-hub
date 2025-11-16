@@ -111,10 +111,10 @@ class MultiMediaService {
     try {
       const screenshotsEndpoint = Endpoints.FETCH_GAME_SCREENSHOTS.replace(':id', gameId.toString());
       const trailersEndpoint = Endpoints.FETCH_GAME_TRAILERS.replace(':id', gameId.toString());
-      
+
       const screenshotsClient = new ApiClient<{ results: GameScreenshot[] }>(screenshotsEndpoint);
       const trailersClient = new ApiClient<{ results: GameTrailer[] }>(trailersEndpoint);
-      
+
       const [screenshotsResponse, trailersResponse] = await Promise.all([
         screenshotsClient.get({ page_size: 20 }),
         trailersClient.get({ page_size: 10 })
@@ -137,7 +137,7 @@ class MultiMediaService {
       const videos: MediaItem[] = trailersResponse?.results?.map((trailer) => {
         // Use the best available video quality
         const videoUrl = trailer.data?.[480] || trailer.data?.[360] || trailer.data?.max || '';
-        
+
         return {
           id: `rawg-video-${trailer.id}`,
           type: 'video' as const,
@@ -149,7 +149,8 @@ class MultiMediaService {
           metadata: {
             duration: 0, // RAWG doesn't provide duration
             format: 'mp4',
-            originalUrl: videoUrl // Store original URL for debugging
+            originalUrl: videoUrl, // Store original URL for debugging
+            isGameplay: false
           }
         };
       }).filter(video => video.url) || []; // Filter out videos without URLs
@@ -227,6 +228,7 @@ class MultiMediaService {
         metadata: {
           duration: 0, // IGDB doesn't provide duration
           format: 'youtube',
+          isGameplay: false
         }
       }));
 
@@ -284,10 +286,10 @@ class MultiMediaService {
         const titleLower = video.snippet.title.toLowerCase();
         const descLower = video.snippet.description.toLowerCase();
         const isGameplay = titleLower.includes('gameplay') ||
-                          titleLower.includes('playthrough') ||
-                          titleLower.includes('walkthrough') ||
-                          titleLower.includes('let\'s play') ||
-                          descLower.includes('gameplay');
+          titleLower.includes('playthrough') ||
+          titleLower.includes('walkthrough') ||
+          titleLower.includes('let\'s play') ||
+          descLower.includes('gameplay');
 
         const mediaItem: MediaItem = {
           id: `youtube-video-${video.id.videoId}`,
@@ -303,6 +305,7 @@ class MultiMediaService {
             format: 'youtube',
             tags: [video.snippet.channelTitle, ...(isGameplay ? ['gameplay'] : ['trailer'])],
             uploadDate: video.snippet.publishedAt,
+            isGameplay: isGameplay
           }
         };
 
@@ -328,19 +331,19 @@ class MultiMediaService {
     try {
       // Import steamApiClient
       const steamApiClient = (await import('./steamApiClient')).default;
-      
+
       if (!steamApiClient.isAvailable()) {
         console.log('Steam API not available, skipping');
         return { screenshots: [], videos: [], artwork: [] };
       }
 
       let steamAppDetails = null;
-      
+
       // Try to get Steam app details by ID first
       if (gameId) {
         steamAppDetails = await steamApiClient.getAppDetails(gameId);
       }
-      
+
       // If no details found and we have a game name, try searching
       if (!steamAppDetails && gameName) {
         const searchResults = await steamApiClient.searchApps(gameName, 5);
@@ -380,6 +383,7 @@ class MultiMediaService {
           duration: 0, // Steam doesn't provide duration
           format: 'mp4',
           webmUrl: movie.webm.max || movie.webm[480] || '',
+          isGameplay: false
         }
       })).filter(video => video.url) || [];
 
@@ -507,7 +511,7 @@ class MultiMediaService {
     for (const item of mediaItems) {
       // Create a normalized URL for comparison
       const normalizedUrl = this.normalizeMediaUrl(item.url);
-      
+
       if (!seen.has(normalizedUrl)) {
         seen.add(normalizedUrl);
         uniqueItems.push(item);

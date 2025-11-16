@@ -13,38 +13,56 @@ interface Props {
 
 const GameTrailer = ({ gameId }: Props) => {
   const { data: gameDetail } = useGameDetail(gameId.toString());
-  const gameDetails = gameDetail ? {
-    name: gameDetail.name,
-    name_original: gameDetail.name_original,
-    released: gameDetail.released
-  } : undefined;
+  const gameDetails = gameDetail
+    ? {
+        name: gameDetail.name,
+        name_original: gameDetail.name_original,
+        released: gameDetail.released,
+      }
+    : undefined;
 
   // Try multi-source media first
-  const { data: mediaCollection, isLoading: isMediaLoading, isStillLoading } = useProgressiveGameMedia(gameId, gameDetails);
+  const {
+    data: mediaCollection,
+    isLoading: isMediaLoading,
+    isStillLoading,
+  } = useProgressiveGameMedia(gameId, gameDetails);
   // Fallback to RAWG-only trailers
-  const { data: rawgTrailer, isLoading: isRawgLoading } = useGameTrailer(gameId);
+  const { data: rawgTrailer, isLoading: isRawgLoading } =
+    useGameTrailer(gameId);
 
   const isLoading = isMediaLoading || isRawgLoading;
 
   // Prefer videos from multi-source, fallback to RAWG trailer
   const videos = mediaCollection?.videos || [];
   const selectedVideo = videos.length > 0 ? videos[0] : null;
-  
+
   // Convert RAWG trailer to MediaItem format if no multi-source videos
-  const fallbackVideo = rawgTrailer ? {
-    id: `rawg-video-${rawgTrailer.id}`,
-    type: 'video' as const,
-    url: rawgTrailer.data[480] || rawgTrailer.data[360] || rawgTrailer.data?.max || '',
-    thumbnail: rawgTrailer.preview,
-    title: rawgTrailer.name,
-    source: 'rawg' as const,
-    gameId,
-    metadata: {
-      duration: 0,
-      format: 'mp4',
-      originalUrl: rawgTrailer.data[480] || rawgTrailer.data[360] || rawgTrailer.data?.max || ''
-    }
-  } : null;
+  const fallbackVideo = rawgTrailer
+    ? {
+        id: `rawg-video-${rawgTrailer.id}`,
+        type: "video" as const,
+        url:
+          rawgTrailer.data[480] ||
+          rawgTrailer.data[360] ||
+          rawgTrailer.data?.max ||
+          "",
+        thumbnail: rawgTrailer.preview,
+        title: rawgTrailer.name,
+        source: "rawg" as const,
+        gameId,
+        metadata: {
+          duration: 0,
+          format: "mp4",
+          originalUrl:
+            rawgTrailer.data[480] ||
+            rawgTrailer.data[360] ||
+            rawgTrailer.data?.max ||
+            "",
+          isGameplay: false,
+        },
+      }
+    : null;
 
   const videoToShow = selectedVideo || fallbackVideo;
 
@@ -53,33 +71,23 @@ const GameTrailer = ({ gameId }: Props) => {
 
   return (
     <>
-      <Hide above='lg'>
-        <SectionHeading headingText='Game Trailer' />
+      <Hide above="lg">
+        <SectionHeading headingText="Game Trailer" />
       </Hide>
 
-      <VideoPlayer 
-        media={videoToShow}
-        autoplay={false}
-        showControls={true}
-      />
-      
+      <VideoPlayer media={videoToShow} autoplay={false} showControls={true} />
+
       {isStillLoading && (
-        <Flex 
-          justify="center" 
-          align="center" 
-          py={3} 
-          gap={2}
-          color="gray.500"
-        >
+        <Flex justify="center" align="center" py={3} gap={2} color="gray.500">
           <Spinner size="sm" />
           <Text fontSize="sm">Loading more videos...</Text>
         </Flex>
       )}
-      
-      <Hide below='md'>
+
+      <Hide below="md">
         <TrailerHeading headingText={videoToShow.title} />
       </Hide>
-      <Hide below='md'>
+      <Hide below="md">
         <TrailerCarousel gameId={gameId} />
       </Hide>
     </>
